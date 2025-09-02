@@ -1,11 +1,12 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using System.Collections;
 using UnityEngine.Serialization;
 
 public class Monster : MonoBehaviour
 {
     public GameObject m_moveTarget;
-    public float m_speed = 0.1f;
+    public float m_speed = 10f;
     public int m_maxHP = 30;
     const float m_reachDistance = 0.3f;
 
@@ -27,7 +28,10 @@ public class Monster : MonoBehaviour
 
             return;
         }
+    }
 
+    private void FixedUpdate()
+    {
         var translation = m_moveTarget.transform.position - transform.position;
 
         if (translation.magnitude > m_speed)
@@ -35,6 +39,6 @@ public class Monster : MonoBehaviour
             translation = translation.normalized * m_speed;
         }
 
-        transform.Translate(translation);
+        transform.Translate(translation * Time.fixedDeltaTime);
     }
 }

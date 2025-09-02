@@ -1,43 +1,46 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.Serialization;
 
 public class CannonTower : MonoBehaviour
 {
-    public float m_shootInterval = 0.5f;
-    public float m_range = 4f;
-    public GameObject m_projectilePrefab;
-    public Transform m_shootPoint;
+    [SerializeField] private float _shootInterval = 0.5f;
+    [SerializeField] private float _range = 4f;
+    [SerializeField] private GameObject _projectilePrefab;
+    [SerializeField] private Transform _shootPoint;
+    [SerializeField] private CannonType _type;
 
-    private float m_lastShotTime = -0.5f;
+    private float _lastShotTime = -0.5f;
     private Vector3 _projectileDirection;
+    private Vector3 _interceptPoint;
     public Vector3 ProjectileDirection => _projectileDirection;
 
-    void Update()
+    private void Update()
     {
-        if (m_projectilePrefab == null || m_shootPoint == null) return;
+        if (_projectilePrefab == null || _shootPoint == null) return;
 
         var monster = FindNearestTarget();
 
         if (monster == null) return;
 
-        float projectileSpeed = m_projectilePrefab.GetComponent<CannonProjectile>().m_speed;
+        float projectileSpeed = _projectilePrefab.GetComponent<CannonProjectile>().Speed;
 
-        if (CalculateInterceptDirection(m_shootPoint.position, monster.transform.position,
-                CalculateMonsterSpeedVector(monster), projectileSpeed, out _projectileDirection))
+        if (CalculateInterceptDirection(_shootPoint.position, monster.transform.position,
+                CalculateMonsterSpeedVector(monster), projectileSpeed, out _projectileDirection, out _interceptPoint))
         {
-            Debug.DrawRay(m_shootPoint.position, _projectileDirection * 100, Color.red, 2f);
+            Debug.DrawRay(_shootPoint.position, _projectileDirection * 30, Color.red, 1f);
 
-            if (m_lastShotTime + m_shootInterval <= Time.time)
+            if (_lastShotTime + _shootInterval <= Time.time)
             {
                 Shoot(_projectileDirection);
-                m_lastShotTime = Time.time;
+                _lastShotTime = Time.time;
             }
         }
     }
 
     private Monster FindNearestTarget()
     {
-        float closestDistance = m_range;
+        float closestDistance = _range;
         Monster closest = null;
 
         foreach (var monster in FindObjectsOfType<Monster>())
@@ -56,11 +59,16 @@ public class CannonTower : MonoBehaviour
 
     private void Shoot(Vector3 direction)
     {
-        Instantiate(m_projectilePrefab, m_shootPoint.position, Quaternion.LookRotation(direction));
+        Debug.DrawRay(_shootPoint.position, direction * 30, Color.blue, 2f);
+
+        GameObject projectile =
+            Instantiate(_projectilePrefab, _shootPoint.position, Quaternion.LookRotation(direction));
+
+        projectile.GetComponent<CannonProjectile>().Initialize(_type, _interceptPoint);
     }
 
     private bool CalculateInterceptDirection(Vector3 shooterPos, Vector3 monsterPos, Vector3 monsterVelocity,
-        float projectileSpeed, out Vector3 direction)
+        float projectileSpeed, out Vector3 direction, out Vector3 interceptPoint)
     {
         Vector3 displacement = monsterPos - shooterPos;
         float a = Vector3.Dot(monsterVelocity, monsterVelocity) - projectileSpeed * projectileSpeed;
@@ -72,6 +80,7 @@ public class CannonTower : MonoBehaviour
         if (discriminant < 0f)
         {
             direction = Vector3.zero;
+            interceptPoint = Vector3.zero;
 
             return false;
         }
@@ -88,11 +97,12 @@ public class CannonTower : MonoBehaviour
         if (t < 0f)
         {
             direction = Vector3.zero;
+            interceptPoint = Vector3.zero;
 
             return false;
         }
 
-        Vector3 interceptPoint = monsterPos + monsterVelocity * t;
+        interceptPoint = monsterPos + monsterVelocity * t;
         direction = (interceptPoint - shooterPos).normalized;
 
         return true;
