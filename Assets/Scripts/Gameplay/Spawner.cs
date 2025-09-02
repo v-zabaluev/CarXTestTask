@@ -1,30 +1,32 @@
 ﻿using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Gameplay
 {
     public class Spawner : MonoBehaviour
     {
-        public float m_interval = 3;
-        public GameObject m_moveTarget;
-        public FlyingShield m_flyingShieldPrefab;
+        [SerializeField] private float _interval = 3;
+        public GameObject _moveTarget;
+        [SerializeField] private FlyingShield _flyingShieldPrefab;
+        [SerializeField] private GameObject _monsterPrefab;
+        private float _lastSpawn = -1;
 
-        private float m_lastSpawn = -1;
-
-        void Update()
+        private void Update()
         {
-            if (Time.time > m_lastSpawn + m_interval)
+            if (Time.time > _lastSpawn + _interval)
             {
-                var newMonster = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-                var r = newMonster.AddComponent<Rigidbody>();
-                r.useGravity = false;
-                newMonster.transform.position = transform.position;
-                var monsterBeh = newMonster.AddComponent<Monster>();
-                monsterBeh.m_moveTarget = m_moveTarget;
+                // var newMonster = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+                // var r = newMonster.AddComponent<Rigidbody>();
+                // r.useGravity = false;
+                // newMonster.transform.position = transform.position;
+                // var monsterBeh = newMonster.AddComponent<Monster>();
+                GameObject monster = Instantiate(_monsterPrefab, transform.position, Quaternion.identity);
+                monster.GetComponent<MonsterMovement>().SetTarget(_moveTarget);
 
-                if (m_flyingShieldPrefab != null)
-                    Instantiate(m_flyingShieldPrefab, newMonster.transform);
+                if (_flyingShieldPrefab != null)
+                    Instantiate(_flyingShieldPrefab, monster.transform);
 
-                m_lastSpawn = Time.time;
+                _lastSpawn = Time.time;
             }
         }
     }

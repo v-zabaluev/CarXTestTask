@@ -9,7 +9,7 @@ namespace Gameplay.Towers
         protected float _lastShotTime = -0.5f;
 
         [SerializeField] protected TriggerObserver _triggerObserver;
-        protected readonly List<Monster> _targetsInRange = new();
+        protected readonly List<MonsterMovement> _targetsInRange = new();
 
         protected virtual void Awake()
         {
@@ -25,7 +25,7 @@ namespace Gameplay.Towers
 
         protected void OnTriggerEnterInvoked(Collider other)
         {
-            if (other.TryGetComponent(out Monster monster))
+            if (other.TryGetComponent(out MonsterMovement monster))
             {
                 if (!_targetsInRange.Contains(monster))
                     _targetsInRange.Add(monster);
@@ -34,7 +34,7 @@ namespace Gameplay.Towers
 
         protected void OnTriggerExitInvoked(Collider other)
         {
-            if (other.TryGetComponent(out Monster monster))
+            if (other.TryGetComponent(out MonsterMovement monster))
             {
                 _targetsInRange.Remove(monster);
             }

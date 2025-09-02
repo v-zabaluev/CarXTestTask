@@ -31,7 +31,7 @@ namespace Gameplay.Towers.Cannon
             if (_projectilePrefab == null || _shootPoint == null) return;
             if (_targetsInRange.Count == 0) return;
 
-            Monster monster = GetValidTarget();
+            MonsterMovement monster = GetValidTarget();
 
             if (monster == null) return;
 
@@ -51,7 +51,7 @@ namespace Gameplay.Towers.Cannon
             }
         }
 
-        private Monster GetValidTarget()
+        private MonsterMovement GetValidTarget()
         {
             _targetsInRange.RemoveAll(m => m == null);
 
@@ -109,14 +109,9 @@ namespace Gameplay.Towers.Cannon
             return true;
         }
 
-        private Vector3 CalculateMonsterSpeedVector(Monster monster)
+        private Vector3 CalculateMonsterSpeedVector(MonsterMovement monster)
         {
-            if (monster.m_moveTarget == null)
-                return Vector3.zero;
-
-            Vector3 dir = (monster.m_moveTarget.transform.position - monster.transform.position).normalized;
-
-            return dir * monster.m_speed;
+            return monster.GetSpeedVector();
         }
     }
 }

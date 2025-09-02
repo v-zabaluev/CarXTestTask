@@ -30,17 +30,14 @@ namespace Gameplay.Towers.SimpleTower
 
         private void OnTriggerEnter(Collider other)
         {
-            var monster = other.gameObject.GetComponent<Monster>();
+            var monsterHealth = other.gameObject.GetComponent<MonsterHealth>();
 
-            if (monster == null)
+            if (monsterHealth == null)
                 return;
 
-            monster.m_hp -= _damage;
+            Debug.Log("Hit!");
 
-            if (monster.m_hp <= 0)
-            {
-                Destroy(monster.gameObject);
-            }
+            monsterHealth.TakeDamage(_damage);
 
             Destroy(gameObject);
         }
