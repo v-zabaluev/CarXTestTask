@@ -84,7 +84,7 @@ public class FlyingShield : MonoBehaviour
 			return;
 		}
 
-		var cannonProjectile = other.gameObject.GetComponent<CannonProjectile>();
+		var cannonProjectile = other.gameObject.GetComponent<CannonProjectileData>();
 		if (cannonProjectile != null)
 		{
 			Destroy(cannonProjectile.gameObject);

@@ -2,7 +2,7 @@
 using System.Collections;
 using UnityEngine.Serialization;
 
-public class CannonProjectile : MonoBehaviour
+public class CannonProjectileData : MonoBehaviour
 {
     [SerializeField] private float _speed = 0.2f;
     [SerializeField] private int _damage = 10;

@@ -23,7 +23,7 @@ public class CannonTower : MonoBehaviour
 
         if (monster == null) return;
 
-        float projectileSpeed = _projectilePrefab.GetComponent<CannonProjectile>().Speed;
+        float projectileSpeed = _projectilePrefab.GetComponent<CannonProjectileData>().Speed;
 
         if (CalculateInterceptDirection(_shootPoint.position, monster.transform.position,
                 CalculateMonsterSpeedVector(monster), projectileSpeed, out _projectileDirection, out _interceptPoint))
@@ -64,7 +64,7 @@ public class CannonTower : MonoBehaviour
         GameObject projectile =
             Instantiate(_projectilePrefab, _shootPoint.position, Quaternion.LookRotation(direction));
 
-        projectile.GetComponent<CannonProjectile>().Initialize(_type, _interceptPoint);
+        projectile.GetComponent<CannonProjectileData>().Initialize(_type, _interceptPoint);
     }
 
     private bool CalculateInterceptDirection(Vector3 shooterPos, Vector3 monsterPos, Vector3 monsterVelocity,
