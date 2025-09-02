@@ -1,44 +1,38 @@
 ﻿using System.Collections.Generic;
+using Gameplay.Towers.Cannon;
+using Infrastructure.Factory;
+using Services;
+using StaticData.Projectile;
 using UnityEngine;
 
 namespace Gameplay.Towers.Cannon
 {
     public class CannonTower : BaseTower
     {
-        //[SerializeField] private float _range = 4f;
-        [SerializeField] private GameObject _projectilePrefab;
         [SerializeField] private Transform _shootPoint;
+
+        //if you initialize through the factory, then there will be no such nonsense.
         [SerializeField] private CannonType _type;
+        [SerializeField] private CannonProjectileType _cannonProjectileType;
+        [SerializeField] private MortarProjectileType _mortarProjectileType;
 
         private Vector3 _projectileDirection;
         private Vector3 _interceptPoint;
+
         public Vector3 ProjectileDirection => _projectileDirection;
-
-        private void Awake()
-        {
-            _triggerObserver.TriggerEnter += OnTriggerEnterInvoked;
-            _triggerObserver.TriggerExit += OnTriggerExitInvoked;
-        }
-
-        private void OnDestroy()
-        {
-            _triggerObserver.TriggerEnter -= OnTriggerEnterInvoked;
-            _triggerObserver.TriggerExit -= OnTriggerExitInvoked;
-        }
 
         private void Update()
         {
-            if (_projectilePrefab == null || _shootPoint == null) return;
-            if (_targetsInRange.Count == 0) return;
+            if (_shootPoint == null || _targetsInRange.Count == 0) return;
 
             MonsterMovement monster = GetValidTarget();
 
             if (monster == null) return;
 
-            float projectileSpeed = _projectilePrefab.GetComponent<CannonProjectileData>().Speed;
+            float projectileSpeed = GetProjectileSpeed();
 
             if (CalculateInterceptDirection(_shootPoint.position, monster.transform.position,
-                    CalculateMonsterSpeedVector(monster), projectileSpeed, out _projectileDirection,
+                    monster.GetSpeedVector(), projectileSpeed, out _projectileDirection,
                     out _interceptPoint))
             {
                 Debug.DrawRay(_shootPoint.position, _projectileDirection * 30, Color.red, 1f);
@@ -58,14 +52,41 @@ namespace Gameplay.Towers.Cannon
             return _targetsInRange.Count > 0 ? _targetsInRange[0] : null;
         }
 
+        private float GetProjectileSpeed()
+        {
+            switch (_type)
+            {
+                case CannonType.Cannon:
+                    var cannonData = StaticDataService.GetCannonProjectile(_cannonProjectileType);
+
+                    return cannonData != null ? cannonData.Speed : 0f;
+                case CannonType.Mortar:
+                    var mortarData = StaticDataService.GetMortarProjectile(_mortarProjectileType);
+
+                    return mortarData != null ? mortarData.Speed : 0f;
+                default:
+                    return 0f;
+            }
+        }
+
         private void Shoot(Vector3 direction)
         {
             Debug.DrawRay(_shootPoint.position, direction * 30, Color.blue, 2f);
 
-            GameObject projectile =
-                Instantiate(_projectilePrefab, _shootPoint.position, Quaternion.LookRotation(direction));
+            switch (_type)
+            {
+                case CannonType.Cannon:
+                    GameFactory.Instance.CreateCannonProjectile(_cannonProjectileType,
+                        _shootPoint.position, Quaternion.LookRotation(direction), _interceptPoint);
 
-            projectile.GetComponent<CannonProjectileData>().Initialize(_type, _interceptPoint);
+                    break;
+
+                case CannonType.Mortar:
+                    GameFactory.Instance.CreateMortarProjectile(_mortarProjectileType,
+                        _shootPoint.position, Quaternion.LookRotation(direction), _interceptPoint);
+
+                    break;
+            }
         }
 
         private bool CalculateInterceptDirection(Vector3 shooterPos, Vector3 monsterPos, Vector3 monsterVelocity,
@@ -91,9 +112,7 @@ namespace Gameplay.Towers.Cannon
             float t2 = (-b + sqrtD) / (2 * a);
 
             float t = Mathf.Min(t1, t2);
-
-            if (t < 0f)
-                t = Mathf.Max(t1, t2);
+            if (t < 0f) t = Mathf.Max(t1, t2);
 
             if (t < 0f)
             {
@@ -107,11 +126,6 @@ namespace Gameplay.Towers.Cannon
             direction = (interceptPoint - shooterPos).normalized;
 
             return true;
-        }
-
-        private Vector3 CalculateMonsterSpeedVector(MonsterMovement monster)
-        {
-            return monster.GetSpeedVector();
         }
     }
 }

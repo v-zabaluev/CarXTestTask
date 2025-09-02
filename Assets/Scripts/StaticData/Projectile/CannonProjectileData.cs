@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Gameplay.Towers.Cannon;
+using UnityEngine;
 
 namespace StaticData.Projectile
 {
@@ -6,8 +7,9 @@ namespace StaticData.Projectile
     public class CannonProjectileData : ScriptableObject
     {
         public CannonProjectileType Type;
+        public CannonProjectile Prefab;
         public float Speed = 20;
-        public float Damage = 10;
+        public int Damage = 10;
     }
 
     public enum CannonProjectileType

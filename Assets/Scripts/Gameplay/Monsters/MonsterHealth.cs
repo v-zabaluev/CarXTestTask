@@ -19,6 +19,8 @@ public class MonsterHealth : MonoBehaviour
         {
             Die();
         }
+
+        Debug.Log($"Hit! Current HP: {_currentHP}, Damage: {amount}");
     }
 
     private void Die()

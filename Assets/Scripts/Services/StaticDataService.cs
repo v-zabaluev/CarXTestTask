@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
+using Gameplay.Towers.Cannon;
 using StaticData.Projectile;
 using UnityEngine;
-using CannonProjectileData = Gameplay.Towers.Cannon.CannonProjectileData;
 
 namespace Services
 {
