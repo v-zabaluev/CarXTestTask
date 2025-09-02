@@ -9,32 +9,54 @@ public class CannonTower : MonoBehaviour
     public Transform m_shootPoint;
 
     private float m_lastShotTime = -0.5f;
+    private Vector3 _projectileDirection;
+    public Vector3 ProjectileDirection => _projectileDirection;
 
     void Update()
     {
         if (m_projectilePrefab == null || m_shootPoint == null) return;
 
-        foreach (var monster in FindObjectsOfType<Monster>())
+        var monster = FindNearestTarget();
+
+        if (monster == null) return;
+
+        float projectileSpeed = m_projectilePrefab.GetComponent<CannonProjectile>().m_speed;
+
+        if (CalculateInterceptDirection(m_shootPoint.position, monster.transform.position,
+                CalculateMonsterSpeedVector(monster), projectileSpeed, out _projectileDirection))
         {
-            if (Vector3.Distance(transform.position, monster.transform.position) > m_range)
-                continue;
+            Debug.DrawRay(m_shootPoint.position, _projectileDirection * 100, Color.red, 2f);
 
-            if (m_lastShotTime + m_shootInterval > Time.time)
-                continue;
-
-            var projectileSpeed = m_projectilePrefab.GetComponent<CannonProjectile>().m_speed;
-
-            if (CalculateInterceptDirection(m_shootPoint.position, monster.transform.position,
-                    CalculateMonsterSpeedVector(monster), projectileSpeed, out Vector3 projectileDirection))
+            if (m_lastShotTime + m_shootInterval <= Time.time)
             {
-                Debug.DrawRay(m_shootPoint.position, projectileDirection * 100, Color.red, 5f);
-
-                GameObject projectile = Instantiate(m_projectilePrefab, m_shootPoint.position,
-                    Quaternion.LookRotation(projectileDirection));
-
+                Shoot(_projectileDirection);
                 m_lastShotTime = Time.time;
             }
         }
+    }
+
+    private Monster FindNearestTarget()
+    {
+        float closestDistance = m_range;
+        Monster closest = null;
+
+        foreach (var monster in FindObjectsOfType<Monster>())
+        {
+            float distance = Vector3.Distance(transform.position, monster.transform.position);
+
+            if (distance <= closestDistance)
+            {
+                closestDistance = distance;
+                closest = monster;
+            }
+        }
+
+        return closest;
+    }
+
+    private void Shoot(Vector3 direction)
+    {
+        Instantiate(m_projectilePrefab, m_shootPoint.position, Quaternion.LookRotation(direction));
     }
 
     private bool CalculateInterceptDirection(Vector3 shooterPos, Vector3 monsterPos, Vector3 monsterVelocity,
