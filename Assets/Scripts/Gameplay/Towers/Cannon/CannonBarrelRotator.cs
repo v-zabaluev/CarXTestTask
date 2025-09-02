@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Cannon
+namespace Gameplay.Towers.Cannon
 {
     public class CannonBarrelRotator : MonoBehaviour
     {

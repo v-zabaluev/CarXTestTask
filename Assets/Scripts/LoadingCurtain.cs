@@ -1,40 +1,35 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
-using UnityEngine.Serialization;
 
-namespace Assets.CodeBase.Logic
+public class LoadingCurtain : MonoBehaviour
 {
-    public class LoadingCurtain : MonoBehaviour
+    [SerializeField] private CanvasGroup _canvasGroup;
+
+    private void Awake()
     {
-        [SerializeField] private CanvasGroup _canvasGroup;
+        DontDestroyOnLoad(this);
+    }
 
-        private void Awake()
+    public void Show()
+    {
+        gameObject.SetActive(true);
+        _canvasGroup.alpha = 1;
+    }
+
+    public void Hide()
+    {
+        StartCoroutine(FadeIn());
+    }
+
+    private IEnumerator FadeIn()
+    {
+        while (_canvasGroup.alpha > 0)
         {
-            DontDestroyOnLoad(this);
+            _canvasGroup.alpha -= 0.03f;
+
+            yield return new WaitForSeconds(0.03f);
         }
 
-        public void Show()
-        {
-            gameObject.SetActive(true);
-            _canvasGroup.alpha = 1;
-        }
-
-        public void Hide()
-        {
-            StartCoroutine(FadeIn());
-        }
-
-        private IEnumerator FadeIn()
-        {
-            while (_canvasGroup.alpha > 0)
-            {
-                _canvasGroup.alpha -= 0.03f;
-
-                yield return new WaitForSeconds(0.03f);
-            }
-
-            gameObject.SetActive(false);
-        }
+        gameObject.SetActive(false);
     }
 }

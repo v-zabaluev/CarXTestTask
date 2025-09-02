@@ -1,8 +1,6 @@
-﻿using Assets.CodeBase.Logic;
-using CodeBase.Infrastructure.Factory;
-using UnityEngine;
+﻿using Infrastructure.Factory;
 
-namespace CodeBase.Infrastructure.States
+namespace Infrastructure.States
 {
     public class LoadLevelState : IPayloadState<string>
     {

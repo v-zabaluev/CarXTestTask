@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-
-namespace CodeBase.Infrastructure.Factory
+﻿namespace Infrastructure.Factory
 {
     public class GameFactory : IGameFactory
     {

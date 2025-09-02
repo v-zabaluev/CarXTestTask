@@ -1,7 +1,6 @@
-﻿using CodeBase.Infrastructure.Factory;
-using UnityEngine;
+﻿using Services;
 
-namespace CodeBase.Infrastructure.States
+namespace Infrastructure.States
 {
     public class BootStrapState : IState
     {

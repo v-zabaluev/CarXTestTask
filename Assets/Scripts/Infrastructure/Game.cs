@@ -1,7 +1,6 @@
-using Assets.CodeBase.Logic;
-using CodeBase.Infrastructure.States;
+using Infrastructure.States;
 
-namespace CodeBase.Infrastructure
+namespace Infrastructure
 {
     public class Game
     {

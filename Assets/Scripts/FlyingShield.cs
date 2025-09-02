@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using Gameplay.Towers.Cannon;
+using Gameplay.Towers.SimpleTower;
 using UnityEngine;
 
 public class FlyingShield : MonoBehaviour

@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using Assets.CodeBase.Logic;
-using CodeBase.Infrastructure.Factory;
+using Infrastructure.Factory;
 using UnityEngine;
 
-namespace CodeBase.Infrastructure.States
+namespace Infrastructure.States
 {
     public class GameStateMachine : MonoBehaviour
     {
