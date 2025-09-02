@@ -1,33 +1,42 @@
 ﻿using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Gameplay.Towers.SimpleTower
 {
-	public class SimpleTower : MonoBehaviour {
-		public float m_shootInterval = 0.5f;
-		public float m_range = 4f;
-		public GameObject m_projectilePrefab;
+    public class SimpleTower : BaseTower
+    {
+        public GuidedProjectile _projectilePrefab;
 
-		private float m_lastShotTime = -0.5f;
-	
-		void Update () {
-			if (m_projectilePrefab == null)
-				return;
+        private void Update()
+        {
+            if (_projectilePrefab == null)
+                return;
 
-			foreach (var monster in FindObjectsOfType<Monster>()) {
-				if (Vector3.Distance (transform.position, monster.transform.position) > m_range)
-					continue;
+            if (_targetsInRange.Count == 0) return;
 
-				if (m_lastShotTime + m_shootInterval > Time.time)
-					continue;
+            Monster monster = GetValidTarget();
 
-				// shot
-				var projectile = Instantiate(m_projectilePrefab, transform.position + Vector3.up * 1.5f, Quaternion.identity) as GameObject;
-				var projectileBeh = projectile.GetComponent<GuidedProjectile> ();
-				projectileBeh.m_target = monster.gameObject;
+            if (monster == null) return;
 
-				m_lastShotTime = Time.time;
-			}
-	
-		}
-	}
+            if (_lastShotTime + _shootInterval <= Time.time)
+            {
+                // shot
+                var projectile =
+                    Instantiate(_projectilePrefab, transform.position + Vector3.up * 1.5f,
+                        Quaternion.identity);
+
+                var projectileBeh = projectile.GetComponent<GuidedProjectile>();
+                projectileBeh.SetTarget(monster.gameObject);
+
+                _lastShotTime = Time.time;
+            }
+        }
+
+        private Monster GetValidTarget()
+        {
+            _targetsInRange.RemoveAll(m => m == null);
+
+            return _targetsInRange.Count > 0 ? _targetsInRange[0] : null;
+        }
+    }
 }

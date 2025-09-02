@@ -1,32 +1,45 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace Gameplay.Towers.Cannon
 {
-    public class CannonTower : MonoBehaviour
+    public class CannonTower : BaseTower
     {
-        [SerializeField] private float _shootInterval = 0.5f;
-        [SerializeField] private float _range = 4f;
+        //[SerializeField] private float _range = 4f;
         [SerializeField] private GameObject _projectilePrefab;
         [SerializeField] private Transform _shootPoint;
         [SerializeField] private CannonType _type;
 
-        private float _lastShotTime = -0.5f;
         private Vector3 _projectileDirection;
         private Vector3 _interceptPoint;
         public Vector3 ProjectileDirection => _projectileDirection;
 
+        private void Awake()
+        {
+            _triggerObserver.TriggerEnter += OnTriggerEnterInvoked;
+            _triggerObserver.TriggerExit += OnTriggerExitInvoked;
+        }
+
+        private void OnDestroy()
+        {
+            _triggerObserver.TriggerEnter -= OnTriggerEnterInvoked;
+            _triggerObserver.TriggerExit -= OnTriggerExitInvoked;
+        }
+
         private void Update()
         {
             if (_projectilePrefab == null || _shootPoint == null) return;
+            if (_targetsInRange.Count == 0) return;
 
-            var monster = FindNearestTarget();
+            Monster monster = GetValidTarget();
 
             if (monster == null) return;
 
             float projectileSpeed = _projectilePrefab.GetComponent<CannonProjectileData>().Speed;
 
             if (CalculateInterceptDirection(_shootPoint.position, monster.transform.position,
-                    CalculateMonsterSpeedVector(monster), projectileSpeed, out _projectileDirection, out _interceptPoint))
+                    CalculateMonsterSpeedVector(monster), projectileSpeed, out _projectileDirection,
+                    out _interceptPoint))
             {
                 Debug.DrawRay(_shootPoint.position, _projectileDirection * 30, Color.red, 1f);
 
@@ -38,23 +51,11 @@ namespace Gameplay.Towers.Cannon
             }
         }
 
-        private Monster FindNearestTarget()
+        private Monster GetValidTarget()
         {
-            float closestDistance = _range;
-            Monster closest = null;
+            _targetsInRange.RemoveAll(m => m == null);
 
-            foreach (var monster in FindObjectsOfType<Monster>())
-            {
-                float distance = Vector3.Distance(transform.position, monster.transform.position);
-
-                if (distance <= closestDistance)
-                {
-                    closestDistance = distance;
-                    closest = monster;
-                }
-            }
-
-            return closest;
+            return _targetsInRange.Count > 0 ? _targetsInRange[0] : null;
         }
 
         private void Shoot(Vector3 direction)
