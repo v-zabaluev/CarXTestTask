@@ -8,14 +8,9 @@ public class CannonProjectile : MonoBehaviour
 
     private Vector3 m_direction;
 
-    public void SetDirection(Vector3 dir)
-    {
-        m_direction = dir.normalized;
-    }
-
     void Update()
     {
-        transform.position += m_direction * m_speed;
+        transform.Translate(transform.forward * m_speed, Space.World);
     }
 
     void OnTriggerEnter(Collider other)
