@@ -1,4 +1,5 @@
-﻿using Gameplay.Towers.Cannon;
+﻿using Gameplay.Towers;
+using Gameplay.Towers.Cannon;
 using Services;
 using StaticData.Projectile;
 using UnityEngine;
@@ -18,7 +19,6 @@ namespace Infrastructure.Pools
                     var data = StaticDataService.GetCannonProjectile(defaultType);
                     var go = Object.Instantiate(data.Prefab.gameObject);
                     var projectile = go.GetComponent<CannonProjectile>();
-                    projectile.Construct(this);
                     go.SetActive(false);
 
                     return projectile;
@@ -41,7 +41,7 @@ namespace Infrastructure.Pools
             var projectile = _pool.Get();
             projectile.transform.SetPositionAndRotation(spawnPosition, rotation);
             projectile.Initialize(targetPosition, data.Speed, data.Damage);
-
+            projectile.OnDespawn += Release;
             return projectile;
         }
 

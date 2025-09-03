@@ -18,7 +18,6 @@ namespace Infrastructure.Pools
                     var data = StaticDataService.GetMortarProjectile(defaultType);
                     var go = Object.Instantiate(data.Prefab.gameObject);
                     var projectile = go.GetComponent<MortarProjectile>();
-                    projectile.Construct(this);
                     go.SetActive(false);
                     return projectile;
                 },

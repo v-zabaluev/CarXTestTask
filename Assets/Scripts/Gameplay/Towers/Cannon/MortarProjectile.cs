@@ -3,19 +3,12 @@ using UnityEngine;
 
 namespace Gameplay.Towers.Cannon
 {
-    public class MortarProjectile : BaseProjectile
+    public class MortarProjectile : BaseProjectile<MortarProjectile>
     {
-        private MortarProjectilePool _pool;
-        
         private Vector3 _velocity;
         private float _gravity;
-        private bool _initialized = false;
         private float _maxHeight;
 
-        public void Construct(MortarProjectilePool pool)
-        {
-            _pool = pool;
-        }
         public override void Initialize(Vector3 targetPosition, float speed, int damage, float maxHeight = 0f)
         {
             Speed = speed;
@@ -32,6 +25,7 @@ namespace Gameplay.Towers.Cannon
 
             _velocity = horizontalVelocity + Vector3.up * startVy;
             _initialized = true;
+            StartCoroutine(StartDestroyProcess());
         }
 
         private void FixedUpdate()
@@ -50,7 +44,7 @@ namespace Gameplay.Towers.Cannon
             if (monsterHealth == null) return;
 
             monsterHealth.TakeDamage(Damage);
-            _pool.Release(this);
+            DespawnProjectile();
         }
     }
 }

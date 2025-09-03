@@ -1,18 +1,14 @@
-﻿using Infrastructure.Pools;
+﻿using System;
+using System.Collections;
+using Infrastructure.Pools;
 using UnityEngine;
 using UnityEngine.Pool;
 
 namespace Gameplay.Towers.Cannon
 {
-    public class CannonProjectile : BaseProjectile
+    public class CannonProjectile : BaseProjectile<CannonProjectile>
     {
-        private CannonProjectilePool _pool;
-        private bool _initialized = false;
-
-        public void Construct(CannonProjectilePool pool)
-        {
-            _pool = pool;
-        }
+        //public Action<BaseProjectile> OnDespawn;
 
         public override void Initialize(Vector3 targetPosition, float speed,
             int damage, float maxHeight = 0f)
@@ -20,6 +16,8 @@ namespace Gameplay.Towers.Cannon
             Speed = speed;
             Damage = damage;
             _initialized = true;
+            
+            StartCoroutine(StartDestroyProcess());
         }
 
         private void FixedUpdate()
@@ -35,7 +33,9 @@ namespace Gameplay.Towers.Cannon
             if (monsterHealth == null) return;
 
             monsterHealth.TakeDamage(Damage);
-            _pool.Release(this);
+            DespawnProjectile();
         }
+
+       
     }
 }
