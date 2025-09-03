@@ -10,13 +10,14 @@ namespace Gameplay.Towers.Cannon
 
         [SerializeField] private float _turnSpeed = 5f;
 
+        public Transform BarrelTransform => _barrelStand;
+
         void Update()
         {
             if (_tower == null || _barrel == null || _barrelStand == null ||
                 _tower.CannonType != CannonType.Cannon) return;
 
             Vector3 targetDir = _tower.ProjectileDirection;
-           
 
             if (targetDir != Vector3.zero)
             {
@@ -24,6 +25,7 @@ namespace Gameplay.Towers.Cannon
 
                 _barrelStand.rotation = Quaternion.RotateTowards(_barrelStand.rotation, targetRotation,
                     _turnSpeed * Time.deltaTime * 100f);
+
                 _barrel.localRotation = Quaternion.identity;
             }
         }

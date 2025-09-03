@@ -1,17 +1,23 @@
 ﻿using Gameplay.Towers.Cannon;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class MortarBarrelRotator : MonoBehaviour
 {
-    [SerializeField] private Transform _basePivot;
+    [FormerlySerializedAs("_basePivot")] [SerializeField] private Transform _barrelStand;
     [SerializeField] private Transform _barrel;
     [SerializeField] private CannonTower _tower;
 
     [SerializeField] private float _turnSpeed = 5f;
+    public Transform Barrel => _barrel;
+    public Transform BarrelStand => _barrelStand;
+    
+    public Vector3 CurrentAimDirection { get; private set; }
+
 
     void Update()
     {
-        if (_tower == null || _basePivot == null || _barrel == null || _tower.CannonType != CannonType.Mortar)
+        if (_tower == null || _barrelStand == null || _barrel == null || _tower.CannonType != CannonType.Mortar)
             return;
 
       
@@ -24,21 +30,21 @@ public class MortarBarrelRotator : MonoBehaviour
 
         if (initialVelocity == Vector3.zero)
             return;
-
+        CurrentAimDirection = initialVelocity.normalized;
         Vector3 horizontalDir = new Vector3(initialVelocity.x, 0f, initialVelocity.z);
 
         if (horizontalDir.sqrMagnitude > 0.001f)
         {
             Quaternion targetYaw = Quaternion.LookRotation(horizontalDir);
 
-            _basePivot.rotation = Quaternion.RotateTowards(
-                _basePivot.rotation,
+            _barrelStand.rotation = Quaternion.RotateTowards(
+                _barrelStand.rotation,
                 targetYaw,
                 _turnSpeed * Time.deltaTime * 100f
             );
         }
         
-        Vector3 localDir = _basePivot.InverseTransformDirection(initialVelocity.normalized);
+        Vector3 localDir = _barrelStand.InverseTransformDirection(initialVelocity.normalized);
         float angleX = -1* Mathf.Atan2(localDir.y, localDir.z) * Mathf.Rad2Deg;
 
         Quaternion targetPitch = Quaternion.Euler(angleX, 0f, 0f);

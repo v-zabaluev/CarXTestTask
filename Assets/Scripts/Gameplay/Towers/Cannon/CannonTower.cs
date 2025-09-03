@@ -17,6 +17,9 @@ namespace Gameplay.Towers.Cannon
         [SerializeField] private CannonProjectileType _cannonProjectileType;
         [SerializeField] private MortarProjectileType _mortarProjectileType;
 
+        [SerializeField] private CannonBarrelRotator _barrelRotator;
+        [SerializeField] private MortarBarrelRotator _mortarRotator;
+
         private Vector3 _projectileDirection;
         private Vector3 _interceptPoint;
 
@@ -24,34 +27,6 @@ namespace Gameplay.Towers.Cannon
         public Vector3 InterceptPoint => _interceptPoint;
         public Vector3 ShootPoint => _shootPoint.position;
         public CannonType CannonType => _type;
-
-        private void Update()
-        {
-            if (_shootPoint == null || _targetsInRange.Count == 0) return;
-
-            MonsterMovementController monsterMovementController = GetValidTargetMovementController();
-
-            if (monsterMovementController == null) return;
-
-            if (monsterMovementController.GetInterceptInfo(_shootPoint.position, GetProjectileSpeed(),
-                    out _projectileDirection, out _interceptPoint))
-            {
-                Debug.DrawRay(_shootPoint.position, _projectileDirection * 30, Color.red, 1f);
-
-                if (_lastShotTime + _shootInterval <= Time.time)
-                {
-                    Shoot(_projectileDirection);
-                    _lastShotTime = Time.time;
-                }
-            }
-        }
-
-        private MonsterMovementController GetValidTargetMovementController()
-        {
-            _targetsInRange.RemoveAll(m => m == null);
-
-            return _targetsInRange.Count > 0 ? _targetsInRange[0] : null;
-        }
 
         public float GetProjectileSpeed()
         {
@@ -83,6 +58,62 @@ namespace Gameplay.Towers.Cannon
             }
         }
 
+        public bool IsCannonAimed(Vector3 targetDirection, Transform barrelTransform, float aimTolerance = 1f)
+        {
+            Vector3 currentDir = barrelTransform.forward;
+            float angle = Vector3.Angle(currentDir, targetDirection);
+
+            return angle <= aimTolerance;
+        }
+
+        public bool IsMortarAimed(Vector3 aimDirection, Transform barrel, float aimTolerance = 2f)
+        {
+            float angle = Vector3.Angle(barrel.forward, aimDirection);
+
+            return angle <= aimTolerance;
+        }
+
+        private void Update()
+        {
+            if (_shootPoint == null || _targetsInRange.Count == 0) return;
+
+            MonsterMovementController monsterMovementController = GetValidTargetMovementController();
+
+            if (monsterMovementController == null) return;
+
+            if (monsterMovementController.GetInterceptInfo(_shootPoint.position, GetProjectileSpeed(),
+                    out _projectileDirection, out _interceptPoint))
+            {
+                Debug.DrawRay(_shootPoint.position, _projectileDirection * 30, Color.red, 1f);
+
+                bool cannonReady = false;
+
+                if (_type == CannonType.Cannon && _barrelRotator != null)
+                    cannonReady = IsCannonAimed(_projectileDirection, _barrelRotator.BarrelTransform);
+
+                bool mortarReady = false;
+
+                if (_type == CannonType.Mortar && _mortarRotator != null)
+                {
+                    mortarReady = IsMortarAimed(_mortarRotator.CurrentAimDirection,
+                        _mortarRotator.Barrel);
+                }
+
+                if (_lastShotTime + _shootInterval <= Time.time && (cannonReady || mortarReady))
+                {
+                    Shoot(_projectileDirection);
+                    _lastShotTime = Time.time;
+                }
+            }
+        }
+
+        private MonsterMovementController GetValidTargetMovementController()
+        {
+            _targetsInRange.RemoveAll(m => m == null);
+
+            return _targetsInRange.Count > 0 ? _targetsInRange[0] : null;
+        }
+
         private void Shoot(Vector3 direction)
         {
             Debug.DrawRay(_shootPoint.position, direction * 30, Color.blue, 2f);
@@ -102,6 +133,5 @@ namespace Gameplay.Towers.Cannon
                     break;
             }
         }
-        
     }
 }
