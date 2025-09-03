@@ -1,14 +1,21 @@
-﻿using UnityEngine;
+﻿using Infrastructure.Pools;
+using UnityEngine;
 
 namespace Gameplay.Towers.Cannon
 {
     public class MortarProjectile : BaseProjectile
     {
+        private MortarProjectilePool _pool;
+        
         private Vector3 _velocity;
         private float _gravity;
         private bool _initialized = false;
         private float _maxHeight;
 
+        public void Construct(MortarProjectilePool pool)
+        {
+            _pool = pool;
+        }
         public override void Initialize(Vector3 targetPosition, float speed, int damage, float maxHeight = 0f)
         {
             Speed = speed;
@@ -43,7 +50,7 @@ namespace Gameplay.Towers.Cannon
             if (monsterHealth == null) return;
 
             monsterHealth.TakeDamage(Damage);
-            Destroy(gameObject);
+            _pool.Release(this);
         }
     }
 }

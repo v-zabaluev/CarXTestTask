@@ -1,5 +1,5 @@
 ﻿using Gameplay.Towers.Cannon;
-using Services;
+using Infrastructure.Pools;
 using StaticData.Projectile;
 using UnityEngine;
 
@@ -9,45 +9,27 @@ namespace Infrastructure.Factory
     {
         private static GameFactory _instance;
 
-        public static GameFactory Instance
-        {
-            get
-            {
-                if (_instance == null)
-                {
-                    _instance = new GameFactory();
-                }
+        private readonly CannonProjectilePool _cannonProjectilePool;
+        private readonly MortarProjectilePool _mortarProjectilePool;
 
-                return _instance;
-            }
+        public static GameFactory Instance => _instance ??= new GameFactory();
+
+        private GameFactory()
+        {
+            _cannonProjectilePool = new CannonProjectilePool();
+            _mortarProjectilePool = new MortarProjectilePool();
         }
 
-        public GameObject CreateCannonProjectile(CannonProjectileType type, Vector3 spawnPosition, Quaternion rotation,
-            Vector3 targetPosition)
+        public GameObject CreateCannonProjectile(CannonProjectileType type, Vector3 spawnPosition, Quaternion rotation, Vector3 targetPosition)
         {
-            CannonProjectileData data = StaticDataService.GetCannonProjectile(type);
-
-            if (data == null) return null;
-
-            GameObject projectileGO = Object.Instantiate(data.Prefab.gameObject, spawnPosition, rotation);
-            var projectile = projectileGO.GetComponent<CannonProjectile>();
-            projectile.Initialize(targetPosition, data.Speed, data.Damage);
-
-            return projectileGO;
+            var projectile = _cannonProjectilePool.Get(spawnPosition, rotation, targetPosition, type);
+            return projectile?.gameObject;
         }
 
-        public GameObject CreateMortarProjectile(MortarProjectileType type, Vector3 spawnPosition, Quaternion rotation,
-            Vector3 targetPosition)
+        public GameObject CreateMortarProjectile(MortarProjectileType type, Vector3 spawnPosition, Quaternion rotation, Vector3 targetPosition)
         {
-            var data = StaticDataService.GetMortarProjectile(type);
-
-            if (data == null) return null;
-
-            GameObject projectileGO = Object.Instantiate(data.Prefab.gameObject, spawnPosition, rotation);
-            var projectile = projectileGO.GetComponent<MortarProjectile>();
-            projectile.Initialize(targetPosition, data.Speed, data.Damage, data.MaxHeight);
-
-            return projectileGO;
+            var projectile = _mortarProjectilePool.Get(spawnPosition, rotation, targetPosition, type);
+            return projectile?.gameObject;
         }
     }
 }
