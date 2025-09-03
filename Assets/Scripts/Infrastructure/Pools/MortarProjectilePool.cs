@@ -37,7 +37,7 @@ namespace Infrastructure.Pools
             var projectile = _pool.Get();
             projectile.transform.SetPositionAndRotation(spawnPosition, rotation);
             projectile.Initialize(targetPosition, data.Speed, data.Damage, data.MaxHeight);
-
+            projectile.OnDespawn += Release;
             return projectile;
         }
 
