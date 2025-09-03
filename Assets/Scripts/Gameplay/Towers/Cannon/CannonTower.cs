@@ -28,13 +28,13 @@ namespace Gameplay.Towers.Cannon
         {
             if (_shootPoint == null || _targetsInRange.Count == 0) return;
 
-            MonsterMovement monster = GetValidTarget();
+            MonsterMovementBase monster = GetValidTarget();
 
             if (monster == null) return;
 
             float projectileSpeed = GetProjectileSpeed();
 
-            if (CalculateInterceptDirection(_shootPoint.position, monster.transform.position,
+            if (CalculateInterceptPointAndDirection(_shootPoint.position, monster.transform.position,
                     monster.GetSpeedVector(), projectileSpeed, out _projectileDirection,
                     out _interceptPoint))
             {
@@ -48,7 +48,7 @@ namespace Gameplay.Towers.Cannon
             }
         }
 
-        private MonsterMovement GetValidTarget()
+        private MonsterMovementBase GetValidTarget()
         {
             _targetsInRange.RemoveAll(m => m == null);
 
@@ -94,8 +94,7 @@ namespace Gameplay.Towers.Cannon
                     return 0f;
             }
         }
-        
-        
+
         public float GetProjectileMaxHeight()
         {
             switch (_type)
@@ -129,7 +128,7 @@ namespace Gameplay.Towers.Cannon
             }
         }
 
-        private bool CalculateInterceptDirection(Vector3 shooterPos, Vector3 monsterPos, Vector3 monsterVelocity,
+        private bool CalculateInterceptPointAndDirection(Vector3 shooterPos, Vector3 monsterPos, Vector3 monsterVelocity,
             float projectileSpeed, out Vector3 direction, out Vector3 interceptPoint)
         {
             Vector3 displacement = monsterPos - shooterPos;

@@ -14,7 +14,7 @@ namespace Gameplay.Towers.SimpleTower
 
             if (_targetsInRange.Count == 0) return;
 
-            MonsterMovement monster = GetValidTarget();
+            MonsterMovementBase  monster = GetValidTarget();
 
             if (monster == null) return;
 
@@ -32,7 +32,7 @@ namespace Gameplay.Towers.SimpleTower
             }
         }
 
-        private MonsterMovement GetValidTarget()
+        private MonsterMovementBase  GetValidTarget()
         {
             _targetsInRange.RemoveAll(m => m == null);
 
