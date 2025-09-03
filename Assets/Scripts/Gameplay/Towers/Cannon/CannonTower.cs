@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Gameplay.Movement;
 using Gameplay.Towers.Cannon;
 using Infrastructure.Factory;
 using Services;
@@ -28,11 +29,11 @@ namespace Gameplay.Towers.Cannon
         {
             if (_shootPoint == null || _targetsInRange.Count == 0) return;
 
-            MonsterMovementBase monster = GetValidTarget();
+            MonsterMovementController monsterMovementController = GetValidTargetMovementController();
 
-            if (monster == null) return;
+            if (monsterMovementController == null) return;
 
-            if (monster.CalculateIntercept(_shootPoint.position, GetProjectileSpeed(),
+            if (monsterMovementController.GetInterceptInfo(_shootPoint.position, GetProjectileSpeed(),
                     out _projectileDirection, out _interceptPoint))
             {
                 Debug.DrawRay(_shootPoint.position, _projectileDirection * 30, Color.red, 1f);
@@ -45,35 +46,12 @@ namespace Gameplay.Towers.Cannon
             }
         }
 
-        private MonsterMovementBase GetValidTarget()
+        private MonsterMovementController GetValidTargetMovementController()
         {
             _targetsInRange.RemoveAll(m => m == null);
 
             return _targetsInRange.Count > 0 ? _targetsInRange[0] : null;
         }
-
-        // private MonsterMovement GetValidTarget()
-        // {
-        //     _targetsInRange.RemoveAll(m => m == null);
-        //
-        //     if (_targetsInRange.Count == 0)
-        //         return null;
-        //
-        //     MonsterMovement closest = null;
-        //     float closestDistanceSqr = (_targetsInRange[0].transform.position - _shootPoint.position).sqrMagnitude;
-        //
-        //     foreach (var target in _targetsInRange)
-        //     {
-        //         float distanceSqr = (target.transform.position - _shootPoint.position).sqrMagnitude;
-        //         if (distanceSqr < closestDistanceSqr)
-        //         {
-        //             closestDistanceSqr = distanceSqr;
-        //             closest = target;
-        //         }
-        //     }
-        //
-        //     return closest;
-        // }
 
         public float GetProjectileSpeed()
         {

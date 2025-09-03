@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Gameplay.Movement;
+using UnityEngine;
 using UnityEngine.Serialization;
 
 namespace Gameplay.Towers.SimpleTower
@@ -14,7 +15,7 @@ namespace Gameplay.Towers.SimpleTower
 
             if (_targetsInRange.Count == 0) return;
 
-            MonsterMovementBase  monster = GetValidTarget();
+            MonsterMovementController  monster = GetValidTarget();
 
             if (monster == null) return;
 
@@ -32,7 +33,7 @@ namespace Gameplay.Towers.SimpleTower
             }
         }
 
-        private MonsterMovementBase  GetValidTarget()
+        private MonsterMovementController  GetValidTarget()
         {
             _targetsInRange.RemoveAll(m => m == null);
 

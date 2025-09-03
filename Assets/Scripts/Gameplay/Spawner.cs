@@ -28,11 +28,6 @@ namespace Gameplay
         private float _lastSpawn = -1;
         private List<GameObject> _spawnedMonsters = new List<GameObject>();
 
-        private void Start()
-        {
-            _lastSpawn = -_interval;
-        }
-
         private void Update()
         {
             if (Time.time > _lastSpawn + _interval)
@@ -64,20 +59,34 @@ namespace Gameplay
         {
             foreach (GameObject monster in _spawnedMonsters)
             {
+                if (monster == null)
+                {
+                    _spawnedMonsters.Remove(monster);
+                    return;
+                }
                 MonsterMovementController movementController = monster.GetComponent<MonsterMovementController>();
                 movementController.SetTargetPoints(_moveTarget, _orbitTarget);
                 movementController.SwitchMovementType(MonsterMovementType.Accelerated);
+
             }
+            _monsterMovementType = MonsterMovementType.Accelerated;
+
         }
         
         public void SwitchMovementToLinear()
         {
             foreach (GameObject monster in _spawnedMonsters)
             {
+                if (monster == null)
+                {
+                    _spawnedMonsters.Remove(monster);
+                    return;
+                }
                 MonsterMovementController movementController = monster.GetComponent<MonsterMovementController>();
                 movementController.SetTargetPoints(_moveTarget, _orbitTarget);
                 movementController.SwitchMovementType(MonsterMovementType.Linear);
             }
+            _monsterMovementType = MonsterMovementType.Linear;
         }
         
         public void SwitchMovementToCircular()
@@ -93,6 +102,8 @@ namespace Gameplay
                 movementController.SetTargetPoints(_moveTarget, _orbitTarget);
                 movementController.SwitchMovementType(MonsterMovementType.Circular);
             }
+            _monsterMovementType = MonsterMovementType.Circular;
+
         }
     }
 }

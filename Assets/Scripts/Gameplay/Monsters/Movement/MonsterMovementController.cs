@@ -56,5 +56,36 @@ namespace Gameplay.Movement
                 }
             }
         }
+
+        public bool GetInterceptInfo(Vector3 shootPointPosition, float projectileSpeed,
+            out Vector3 projectileDirection, out Vector3 interceptPoint)
+        {
+            switch (_currentType)
+            {
+                case MonsterMovementType.Linear:
+                    _linear.CalculateIntercept(shootPointPosition, projectileSpeed, out projectileDirection,
+                        out interceptPoint);
+
+                    return true;
+
+                case MonsterMovementType.Accelerated:
+                    _accelerated.CalculateIntercept(shootPointPosition, projectileSpeed, out projectileDirection,
+                        out interceptPoint);
+
+                    return true;
+
+                case MonsterMovementType.Circular:
+                    _circular.CalculateIntercept(shootPointPosition, projectileSpeed, out projectileDirection,
+                        out interceptPoint);
+
+                    return true;
+
+                default:
+                    projectileDirection = Vector3.zero;
+                    interceptPoint = Vector3.zero;
+
+                    return false;
+            }
+        }
     }
 }
