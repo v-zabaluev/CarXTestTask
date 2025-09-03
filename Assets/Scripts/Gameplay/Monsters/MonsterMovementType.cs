@@ -4,6 +4,7 @@
     {
         Linear,
         Accelerated,
-        Circular
+        Circular,
+        PathFollow
     }
 }

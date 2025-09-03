@@ -24,7 +24,10 @@ namespace Gameplay
         [Header("For moving around target")]
 
         [SerializeField] private Transform _orbitTarget;
-
+        
+        [Header("For path following")]
+        [SerializeField] private List<Transform> _pathCheckpoints;
+        
         private float _lastSpawn = -1;
         private List<GameObject> _spawnedMonsters = new List<GameObject>();
 
@@ -47,8 +50,15 @@ namespace Gameplay
             MonsterMovementController movementController = monster.GetComponent<MonsterMovementController>();
             
             movementController.SetTargetPoints(_moveTarget, _orbitTarget);
-            
+            var pathFollow = monster.GetComponent<MonsterMovementPathFollow>();
+            if (pathFollow != null)
+            {
+                pathFollow.SetPath(_pathCheckpoints);
+            }
             movementController.SwitchMovementType(_monsterMovementType);
+            
+
+            
             monster.GetComponent<MonsterHealth>().OnDeath += () => { _spawnedMonsters.Remove(monster); };
             _spawnedMonsters.Add(monster);
 
@@ -103,6 +113,30 @@ namespace Gameplay
                 movementController.SwitchMovementType(MonsterMovementType.Circular);
             }
             _monsterMovementType = MonsterMovementType.Circular;
+
+        }
+        
+        public void SwitchMovementToPathFollow()
+        {
+            foreach (GameObject monster in _spawnedMonsters)
+            {
+                if (monster == null)
+                {
+                    _spawnedMonsters.Remove(monster);
+                    return;
+                }
+                MonsterMovementController movementController = monster.GetComponent<MonsterMovementController>();
+                movementController.SetTargetPoints(_moveTarget, _orbitTarget);
+                
+                var pathFollow = monster.GetComponent<MonsterMovementPathFollow>();
+                if (pathFollow != null)
+                {
+                    pathFollow.SetPath(_pathCheckpoints);
+                }
+                
+                movementController.SwitchMovementType(MonsterMovementType.PathFollow);
+            }
+            _monsterMovementType = MonsterMovementType.PathFollow;
 
         }
     }

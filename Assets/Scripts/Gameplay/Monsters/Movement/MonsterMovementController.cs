@@ -10,6 +10,7 @@ namespace Gameplay.Movement
         [SerializeField] private MonsterMovementLinear _linear;
         [SerializeField] private MonsterMovementAccelerated _accelerated;
         [SerializeField] private MonsterMovementCircular _circular;
+        [SerializeField] private MonsterMovementPathFollow _pathFollow;
 
         private Transform _moveTarget;
         private Transform _orbitTarget;
@@ -55,6 +56,12 @@ namespace Gameplay.Movement
                     _circular.Construct(_orbitTarget);
                 }
             }
+            
+            if (_pathFollow != null)
+            {
+                _pathFollow.enabled = type == MonsterMovementType.PathFollow;
+            }
+
         }
 
         public bool GetInterceptInfo(Vector3 shootPointPosition, float projectileSpeed,
@@ -78,6 +85,11 @@ namespace Gameplay.Movement
                     _circular.CalculateIntercept(shootPointPosition, projectileSpeed, out projectileDirection,
                         out interceptPoint);
 
+                    return true;
+                
+                case MonsterMovementType.PathFollow:
+                    _pathFollow.CalculateIntercept(shootPointPosition, projectileSpeed, out projectileDirection,
+                        out interceptPoint);
                     return true;
 
                 default:
