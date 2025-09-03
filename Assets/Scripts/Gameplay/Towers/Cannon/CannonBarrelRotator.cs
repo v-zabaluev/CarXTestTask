@@ -11,7 +11,7 @@ namespace Gameplay.Towers.Cannon
 
         void Update()
         {
-            if (_tower == null || _barrel == null) return;
+            if (_tower == null || _barrel == null || _tower.CannonType != CannonType.Cannon) return;
 
             Vector3 targetDir = _tower.ProjectileDirection;
 

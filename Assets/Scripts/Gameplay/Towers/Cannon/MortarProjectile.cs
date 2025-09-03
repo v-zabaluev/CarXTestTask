@@ -9,6 +9,7 @@ namespace Gameplay.Towers.Cannon
         private float _gravity;
         private float _maxHeight;
 
+        public Vector3 Velocity => _velocity;
         public override void Initialize(Vector3 targetPosition, float speed, int damage, float maxHeight = 0f)
         {
             Speed = speed;

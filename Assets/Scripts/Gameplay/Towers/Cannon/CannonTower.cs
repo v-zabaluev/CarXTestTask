@@ -20,6 +20,9 @@ namespace Gameplay.Towers.Cannon
         private Vector3 _interceptPoint;
 
         public Vector3 ProjectileDirection => _projectileDirection;
+        public Vector3 InterceptPoint => _interceptPoint;
+        public Vector3 ShootPoint => _shootPoint.position;
+        public CannonType CannonType => _type;
 
         private void Update()
         {
@@ -52,7 +55,30 @@ namespace Gameplay.Towers.Cannon
             return _targetsInRange.Count > 0 ? _targetsInRange[0] : null;
         }
 
-        private float GetProjectileSpeed()
+        // private MonsterMovement GetValidTarget()
+        // {
+        //     _targetsInRange.RemoveAll(m => m == null);
+        //
+        //     if (_targetsInRange.Count == 0)
+        //         return null;
+        //
+        //     MonsterMovement closest = null;
+        //     float closestDistanceSqr = (_targetsInRange[0].transform.position - _shootPoint.position).sqrMagnitude;
+        //
+        //     foreach (var target in _targetsInRange)
+        //     {
+        //         float distanceSqr = (target.transform.position - _shootPoint.position).sqrMagnitude;
+        //         if (distanceSqr < closestDistanceSqr)
+        //         {
+        //             closestDistanceSqr = distanceSqr;
+        //             closest = target;
+        //         }
+        //     }
+        //
+        //     return closest;
+        // }
+
+        public float GetProjectileSpeed()
         {
             switch (_type)
             {
@@ -64,6 +90,20 @@ namespace Gameplay.Towers.Cannon
                     var mortarData = StaticDataService.GetMortarProjectile(_mortarProjectileType);
 
                     return mortarData != null ? mortarData.Speed : 0f;
+                default:
+                    return 0f;
+            }
+        }
+        
+        
+        public float GetProjectileMaxHeight()
+        {
+            switch (_type)
+            {
+                case CannonType.Mortar:
+                    var mortarData = StaticDataService.GetMortarProjectile(_mortarProjectileType);
+
+                    return mortarData != null ? mortarData.MaxHeight : 0f;
                 default:
                     return 0f;
             }
