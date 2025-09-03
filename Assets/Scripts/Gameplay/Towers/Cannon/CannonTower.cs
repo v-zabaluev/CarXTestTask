@@ -32,8 +32,6 @@ namespace Gameplay.Towers.Cannon
 
             if (monster == null) return;
 
-            float projectileSpeed = GetProjectileSpeed();
-
             if (monster.CalculateIntercept(_shootPoint.position, GetProjectileSpeed(),
                     out _projectileDirection, out _interceptPoint))
             {
