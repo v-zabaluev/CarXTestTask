@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.Serialization;
 
 public class MonsterHealth : MonoBehaviour
@@ -6,6 +7,7 @@ public class MonsterHealth : MonoBehaviour
     [SerializeField] private int _maxHP = 30;
 
     private int _currentHP;
+    public Action OnDeath;
 
     private void Start()
     {
@@ -15,6 +17,7 @@ public class MonsterHealth : MonoBehaviour
     public void TakeDamage(int amount)
     {
         _currentHP -= amount;
+
         if (_currentHP <= 0)
         {
             Die();
@@ -25,6 +28,7 @@ public class MonsterHealth : MonoBehaviour
 
     private void Die()
     {
+        OnDeath?.Invoke();
         Destroy(gameObject);
     }
 }

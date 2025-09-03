@@ -5,6 +5,7 @@ public class MonsterMovementAccelerated : MonsterMovementBase
     private const float CalculateInterceptTimeStep = 0.01f;
     private const float MaxPredictionInterceptTime = 6f; //Max flight time
 
+    [SerializeField] private float _reachDistance = 0.3f;
     [SerializeField] private float _initialSpeed = 5f;
     [SerializeField] private float _acceleration = 2f;
 
@@ -15,21 +16,30 @@ public class MonsterMovementAccelerated : MonsterMovementBase
         _currentSpeed = _initialSpeed;
     }
 
+    protected override void Update()
+    {
+        base.Update();
+        if (Vector3.Distance(transform.position, _target.transform.position) <= _reachDistance)
+        {
+            Destroy(gameObject);
+        }
+    }
+
     protected override void Move()
     {
         _currentSpeed += _acceleration * Time.fixedDeltaTime;
-        var translation = (_moveTarget.transform.position - transform.position).normalized;
+        var translation = (_target.transform.position - transform.position).normalized;
         transform.Translate(translation * _currentSpeed * Time.fixedDeltaTime);
     }
 
     public override Vector3 GetSpeedVector()
     {
-        return (_moveTarget.transform.position - transform.position).normalized * _currentSpeed;
+        return (_target.transform.position - transform.position).normalized * _currentSpeed;
     }
 
     public Vector3 GetAccelerationVector()
     {
-        return (_moveTarget.transform.position - transform.position).normalized * _acceleration;
+        return (_target.transform.position - transform.position).normalized * _acceleration;
     }
 
     public override bool CalculateIntercept(Vector3 shooterPos, float projectileSpeed,

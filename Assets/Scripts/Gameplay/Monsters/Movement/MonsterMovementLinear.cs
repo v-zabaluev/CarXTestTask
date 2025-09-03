@@ -2,18 +2,26 @@
 
 public class MonsterMovementLinear : MonsterMovementBase
 {
+    [SerializeField] private float _reachDistance = 0.3f;
     [SerializeField] private float _speed = 10f;
     public float Speed => _speed;
-
+    protected override void Update()
+    {
+        base.Update();
+        if (Vector3.Distance(transform.position, _target.transform.position) <= _reachDistance)
+        {
+            Destroy(gameObject);
+        }
+    }
     protected override void Move()
     {
-        var translation = (_moveTarget.transform.position - transform.position).normalized;
+        var translation = (_target.transform.position - transform.position).normalized;
         transform.Translate(translation * _speed * Time.fixedDeltaTime);
     }
 
     public override Vector3 GetSpeedVector()
     {
-        return (_moveTarget.transform.position - transform.position).normalized * _speed;
+        return (_target.transform.position - transform.position).normalized * _speed;
     }
     
     public override bool CalculateIntercept(Vector3 shooterPos, float projectileSpeed,
