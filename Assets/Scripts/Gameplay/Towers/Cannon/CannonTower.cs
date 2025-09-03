@@ -34,9 +34,8 @@ namespace Gameplay.Towers.Cannon
 
             float projectileSpeed = GetProjectileSpeed();
 
-            if (CalculateInterceptPointAndDirection(_shootPoint.position, monster.transform.position,
-                    monster.GetSpeedVector(), projectileSpeed, out _projectileDirection,
-                    out _interceptPoint))
+            if (monster.CalculateIntercept(_shootPoint.position, GetProjectileSpeed(),
+                    out _projectileDirection, out _interceptPoint))
             {
                 Debug.DrawRay(_shootPoint.position, _projectileDirection * 30, Color.red, 1f);
 
@@ -127,44 +126,6 @@ namespace Gameplay.Towers.Cannon
                     break;
             }
         }
-
-        private bool CalculateInterceptPointAndDirection(Vector3 shooterPos, Vector3 monsterPos, Vector3 monsterVelocity,
-            float projectileSpeed, out Vector3 direction, out Vector3 interceptPoint)
-        {
-            Vector3 displacement = monsterPos - shooterPos;
-            float a = Vector3.Dot(monsterVelocity, monsterVelocity) - projectileSpeed * projectileSpeed;
-            float b = 2f * Vector3.Dot(monsterVelocity, displacement);
-            float c = Vector3.Dot(displacement, displacement);
-
-            float discriminant = b * b - 4 * a * c;
-
-            if (discriminant < 0f)
-            {
-                direction = Vector3.zero;
-                interceptPoint = Vector3.zero;
-
-                return false;
-            }
-
-            float sqrtD = Mathf.Sqrt(discriminant);
-            float t1 = (-b - sqrtD) / (2 * a);
-            float t2 = (-b + sqrtD) / (2 * a);
-
-            float t = Mathf.Min(t1, t2);
-            if (t < 0f) t = Mathf.Max(t1, t2);
-
-            if (t < 0f)
-            {
-                direction = Vector3.zero;
-                interceptPoint = Vector3.zero;
-
-                return false;
-            }
-
-            interceptPoint = monsterPos + monsterVelocity * t;
-            direction = (interceptPoint - shooterPos).normalized;
-
-            return true;
-        }
+        
     }
 }

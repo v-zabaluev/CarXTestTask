@@ -32,4 +32,6 @@ public abstract class MonsterMovementBase : MonoBehaviour
     }
     
     public abstract Vector3 GetSpeedVector();
+    public abstract bool CalculateIntercept(Vector3 shooterPos, float projectileSpeed, 
+        out Vector3 direction, out Vector3 interceptPoint);
 }
