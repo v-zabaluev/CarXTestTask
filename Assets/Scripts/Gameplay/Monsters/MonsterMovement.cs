@@ -13,6 +13,7 @@ public class MonsterMovement : MonoBehaviour
     {
         _moveTarget = target;
     }
+
     private void Update()
     {
         if (_moveTarget == null)
@@ -29,14 +30,9 @@ public class MonsterMovement : MonoBehaviour
         if (_moveTarget == null)
             return;
 
-        var translation = _moveTarget.transform.position - transform.position;
+        var translation = (_moveTarget.transform.position - transform.position).normalized;
 
-        if (translation.magnitude > _speed)
-        {
-            translation = translation.normalized * _speed;
-        }
-
-        transform.Translate(translation * Time.fixedDeltaTime);
+        transform.Translate(translation * _speed * Time.fixedDeltaTime);
     }
 
     public Vector3 GetSpeedVector()
