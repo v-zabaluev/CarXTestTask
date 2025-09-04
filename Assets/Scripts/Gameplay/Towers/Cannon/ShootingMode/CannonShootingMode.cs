@@ -1,4 +1,5 @@
-﻿using Infrastructure.Factory;
+﻿using Gameplay.Towers.Cannon.Projectile;
+using Infrastructure.Factory;
 using Services;
 using StaticData.Projectile;
 using UnityEngine;
@@ -42,11 +43,29 @@ namespace Gameplay.Towers.Cannon
             return cannonData != null ? cannonData.Speed : 0f;
         }
 
-        public bool IsCannonAimed(Vector3 targetDirection, Transform barrelTransform, float aimTolerance = 1f)
+        private bool IsCannonAimed(Vector3 targetDirection, Transform barrelTransform, float aimTolerance = 1f)
         {
             float angle = Vector3.Angle(barrelTransform.forward, targetDirection);
 
             return angle <= aimTolerance;
+        }
+        
+        public float GetProjectileRadius()
+        {
+            GameObject projectileGO = null;
+            var mortarData = StaticDataService.GetCannonProjectile(_cannonProjectileType);
+
+            if (mortarData != null)
+                projectileGO = GameFactory.Instance.CreateCannonProjectile(_cannonProjectileType, Vector3.zero,
+                    Quaternion.identity, Vector3.zero);
+            if (projectileGO == null) return 0f;
+
+            SphereCollider collider = projectileGO.GetComponent<SphereCollider>();
+            projectileGO.SetActive(false);
+            projectileGO.GetComponent<CannonProjectile>().DespawnProjectile();
+
+
+            return collider.radius;
         }
     }
 }

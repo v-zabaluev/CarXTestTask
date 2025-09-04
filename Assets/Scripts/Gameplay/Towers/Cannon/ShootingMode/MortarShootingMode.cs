@@ -1,4 +1,5 @@
-﻿using Infrastructure.Factory;
+﻿using Gameplay.Towers.Cannon.Projectile;
+using Infrastructure.Factory;
 using Services;
 using StaticData.Projectile;
 using UnityEngine;
@@ -39,6 +40,22 @@ namespace Gameplay.Towers.Cannon
         {
             GameFactory.Instance.CreateMortarProjectile(_tower.MortarProjectileType,
                 _tower.ShootPoint, Quaternion.LookRotation(targetPoint), _tower.InterceptPoint);
+        }
+
+        public float GetProjectileRadius()
+        {
+            GameObject projectileGO = null;
+            var mortarData = StaticDataService.GetMortarProjectile(_projectileType);
+
+            if (mortarData != null)
+                projectileGO = GameFactory.Instance.CreateMortarProjectile(_projectileType, Vector3.zero,
+                    Quaternion.identity, Vector3.zero);
+            if (projectileGO == null) return 0f;
+
+            SphereCollider collider = projectileGO.GetComponent<SphereCollider>();
+            projectileGO.GetComponent<MortarProjectile>().DespawnProjectile();
+
+            return collider.radius;
         }
 
         private bool IsMortarAimed(Vector3 aimDirection, Transform barrel, float aimTolerance = 2f)

@@ -34,7 +34,7 @@ namespace Gameplay.Towers.Cannon
         protected override void Awake()
         {
             base.Awake();
-            
+
             switch (_type)
             {
                 case CannonType.Cannon:
@@ -79,7 +79,7 @@ namespace Gameplay.Towers.Cannon
 
             if (defense == null) return false;
 
-            float projectileRadius = GetProjectileRadius();
+            float projectileRadius = _shootingMode.GetProjectileRadius();
 
             return defense.IsInterceptBlocked(
                 projectileRadius,
@@ -88,39 +88,6 @@ namespace Gameplay.Towers.Cannon
                 _shootingMode.GetProjectileSpeed(),
                 6f
             );
-        }
-
-        private float GetProjectileRadius()
-        {
-            GameObject projectileGO = null;
-
-            switch (_type)
-            {
-                case CannonType.Cannon:
-                    var cannonData = StaticDataService.GetCannonProjectile(_cannonProjectileType);
-
-                    if (cannonData != null)
-                        projectileGO = GameFactory.Instance.CreateCannonProjectile(_cannonProjectileType, Vector3.zero,
-                            Quaternion.identity, Vector3.zero);
-
-                    break;
-
-                case CannonType.Mortar:
-                    var mortarData = StaticDataService.GetMortarProjectile(_mortarProjectileType);
-
-                    if (mortarData != null)
-                        projectileGO = GameFactory.Instance.CreateMortarProjectile(_mortarProjectileType, Vector3.zero,
-                            Quaternion.identity, Vector3.zero);
-
-                    break;
-            }
-
-            if (projectileGO == null) return 0f;
-
-            SphereCollider collider = projectileGO.GetComponent<SphereCollider>();
-            projectileGO.SetActive(false);
-
-            return collider.radius;
         }
 
         private MonsterMovementController GetValidTargetMovementController()

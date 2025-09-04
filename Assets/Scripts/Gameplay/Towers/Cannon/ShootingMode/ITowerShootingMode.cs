@@ -8,5 +8,7 @@ namespace Gameplay.Towers.Cannon
         bool IsAimed();
         void Shoot(Vector3 targetPoint);
         float GetProjectileSpeed();
+        
+        float GetProjectileRadius();
     }
 }
