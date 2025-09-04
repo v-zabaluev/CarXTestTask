@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
+using Gameplay.Monsters;
 using Gameplay.Monsters.Movement;
 using Gameplay.Towers.Cannon;
 using Infrastructure.Factory;
 using Services;
 using StaticData.Projectile;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace Gameplay.Towers.Cannon
@@ -86,18 +88,12 @@ namespace Gameplay.Towers.Cannon
             {
                 Debug.DrawRay(_shootPoint.position, _projectileDirection * 30, Color.red, 1f);
 
-                bool cannonReady = false;
+                var cannonReady = IsCannonReady();
 
-                if (_type == CannonType.Cannon && _barrelRotator != null)
-                    cannonReady = IsCannonAimed(_projectileDirection, _barrelRotator.BarrelTransform);
+                var mortarReady = IsMortarReady();
 
-                bool mortarReady = false;
-
-                if (_type == CannonType.Mortar && _mortarRotator != null)
-                {
-                    mortarReady = IsMortarAimed(_mortarRotator.CurrentAimDirection,
-                        _mortarRotator.Barrel);
-                }
+                if (WillShieldBlock(monsterMovementController))
+                    return;
 
                 if (_lastShotTime + _shootInterval <= Time.time && (cannonReady || mortarReady))
                 {
@@ -105,6 +101,76 @@ namespace Gameplay.Towers.Cannon
                     _lastShotTime = Time.time;
                 }
             }
+        }
+
+        private bool WillShieldBlock(MonsterMovementController monsterMovementController)
+        {
+            var defense = monsterMovementController.GetComponent<MonsterDefenseController>();
+            if (defense == null) return false;
+
+            Collider projectileCollider = GetProjectileCollider();
+            if (projectileCollider == null) return false;
+
+            bool blocked = defense.IsInterceptBlocked(
+                projectileCollider,
+                _shootPoint.position,
+                _projectileDirection,
+                GetProjectileSpeed(),
+                6f
+            );
+
+            return blocked;
+        }
+        
+        private Collider GetProjectileCollider()
+        {
+            GameObject projectileGO = null;
+
+            switch (_type)
+            {
+                case CannonType.Cannon:
+                    var cannonData = StaticDataService.GetCannonProjectile(_cannonProjectileType);
+                    if (cannonData != null)
+                        projectileGO = GameFactory.Instance.CreateCannonProjectile(_cannonProjectileType, Vector3.zero, Quaternion.identity, Vector3.zero);
+                    break;
+
+                case CannonType.Mortar:
+                    var mortarData = StaticDataService.GetMortarProjectile(_mortarProjectileType);
+                    if (mortarData != null)
+                        projectileGO = GameFactory.Instance.CreateMortarProjectile(_mortarProjectileType, Vector3.zero, Quaternion.identity, Vector3.zero);
+                    break;
+            }
+
+            if (projectileGO == null)
+                return null;
+
+            Collider collider = projectileGO.GetComponent<Collider>();
+            projectileGO.SetActive(false);
+            return collider;
+        }
+
+
+        private bool IsMortarReady()
+        {
+            bool mortarReady = false;
+
+            if (_type == CannonType.Mortar && _mortarRotator != null)
+            {
+                mortarReady = IsMortarAimed(_mortarRotator.CurrentAimDirection,
+                    _mortarRotator.Barrel);
+            }
+
+            return mortarReady;
+        }
+
+        private bool IsCannonReady()
+        {
+            bool cannonReady = false;
+
+            if (_type == CannonType.Cannon && _barrelRotator != null)
+                cannonReady = IsCannonAimed(_projectileDirection, _barrelRotator.BarrelTransform);
+
+            return cannonReady;
         }
 
         private MonsterMovementController GetValidTargetMovementController()
