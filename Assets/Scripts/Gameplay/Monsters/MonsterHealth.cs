@@ -1,34 +1,36 @@
 ﻿using System;
 using UnityEngine;
-using UnityEngine.Serialization;
 
-public class MonsterHealth : MonoBehaviour
+namespace Gameplay.Monsters
 {
-    [SerializeField] private int _maxHP = 30;
-
-    private int _currentHP;
-    public Action OnDeath;
-
-    private void Start()
+    public class MonsterHealth : MonoBehaviour
     {
-        _currentHP = _maxHP;
-    }
+        [SerializeField] private int _maxHP = 30;
 
-    public void TakeDamage(int amount)
-    {
-        _currentHP -= amount;
+        private int _currentHP;
+        public Action OnDeath;
 
-        if (_currentHP <= 0)
+        private void Start()
         {
-            Die();
+            _currentHP = _maxHP;
         }
 
-        Debug.Log($"Hit! Current HP: {_currentHP}, Damage: {amount}");
-    }
+        public void TakeDamage(int amount)
+        {
+            _currentHP -= amount;
 
-    private void Die()
-    {
-        OnDeath?.Invoke();
-        Destroy(gameObject);
+            if (_currentHP <= 0)
+            {
+                Die();
+            }
+
+            Debug.Log($"Hit! Current HP: {_currentHP}, Damage: {amount}");
+        }
+
+        private void Die()
+        {
+            OnDeath?.Invoke();
+            Destroy(gameObject);
+        }
     }
 }

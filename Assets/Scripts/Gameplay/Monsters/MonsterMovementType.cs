@@ -1,4 +1,4 @@
-﻿namespace Gameplay
+﻿namespace Gameplay.Monsters
 {
     public enum MonsterMovementType
     {

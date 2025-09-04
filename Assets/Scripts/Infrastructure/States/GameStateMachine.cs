@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Infrastructure.Factory;
+using Infrastructure.SceneTransition;
 using UnityEngine;
 
 namespace Infrastructure.States

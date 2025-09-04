@@ -1,4 +1,4 @@
-﻿using Gameplay.Movement;
+﻿using Gameplay.Monsters.Movement;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -8,6 +8,8 @@ namespace Gameplay.Towers.SimpleTower
     {
         public GuidedProjectile _projectilePrefab;
 
+        [SerializeField] private float _projectileSpeed = 0.2f;
+        [SerializeField] private int _projectileDamage = 10;
         private void Update()
         {
             if (_projectilePrefab == null)
@@ -27,7 +29,7 @@ namespace Gameplay.Towers.SimpleTower
                         Quaternion.identity);
 
                 var projectileBeh = projectile.GetComponent<GuidedProjectile>();
-                projectileBeh.SetTarget(monster.gameObject);
+                projectileBeh.Initialize(monster.gameObject.transform.position, _projectileSpeed, _projectileDamage);
 
                 _lastShotTime = Time.time;
             }

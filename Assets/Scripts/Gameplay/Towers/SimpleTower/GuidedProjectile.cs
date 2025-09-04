@@ -1,50 +1,37 @@
-﻿using UnityEngine;
+﻿using Gameplay.Monsters;
+using UnityEngine;
 using UnityEngine.Serialization;
 
 namespace Gameplay.Towers.SimpleTower
 {
-    public class GuidedProjectile : MonoBehaviour
+    public class GuidedProjectile : BaseProjectile<GuidedProjectile>
     {
-        [SerializeField] private GameObject _target;
-        [SerializeField] private float _speed = 0.2f;
-        [SerializeField] private int _damage = 10;
+        private Vector3 _targetPosition;
+
+        public override void Initialize(Vector3 targetPosition, float speed, int damage, float maxHeight = 0f)
+        {
+            _initialized = true;
+            _targetPosition = targetPosition;
+            Speed = speed;
+            Damage = damage;
+            StartCoroutine(StartDestroyProcess());
+        }
 
         private void Update()
         {
-            if (_target == null)
-            {
-                Destroy(gameObject);
+            if (!_initialized) return;
 
-                return;
-            }
-
-            var translation = _target.transform.position - transform.position;
-
-            if (translation.magnitude > _speed)
-            {
-                translation = translation.normalized * _speed;
-            }
-
-            transform.Translate(translation);
+            transform.position = Vector3.MoveTowards(transform.position, _targetPosition, Speed * Time.deltaTime);
         }
 
         private void OnTriggerEnter(Collider other)
         {
             var monsterHealth = other.gameObject.GetComponent<MonsterHealth>();
 
-            if (monsterHealth == null)
-                return;
+            if (monsterHealth == null) return;
 
-            Debug.Log("Hit!");
-
-            monsterHealth.TakeDamage(_damage);
-
-            Destroy(gameObject);
-        }
-
-        public void SetTarget(GameObject target)
-        {
-            _target = target;
+            monsterHealth.TakeDamage(Damage);
+            DespawnProjectile();
         }
     }
 }

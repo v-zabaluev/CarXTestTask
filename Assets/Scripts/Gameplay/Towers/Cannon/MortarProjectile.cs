@@ -1,4 +1,5 @@
-﻿using Infrastructure.Pools;
+﻿using Gameplay.Monsters;
+using Infrastructure.Pools;
 using UnityEngine;
 
 namespace Gameplay.Towers.Cannon

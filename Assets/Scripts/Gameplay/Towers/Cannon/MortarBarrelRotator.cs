@@ -1,80 +1,82 @@
-﻿using Gameplay.Towers.Cannon;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Serialization;
 
-public class MortarBarrelRotator : MonoBehaviour
+namespace Gameplay.Towers.Cannon
 {
-    [FormerlySerializedAs("_basePivot")] [SerializeField] private Transform _barrelStand;
-    [SerializeField] private Transform _barrel;
-    [SerializeField] private CannonTower _tower;
-
-    [SerializeField] private float _turnSpeed = 5f;
-    public Transform Barrel => _barrel;
-    public Transform BarrelStand => _barrelStand;
-    
-    public Vector3 CurrentAimDirection { get; private set; }
-
-
-    void Update()
+    public class MortarBarrelRotator : MonoBehaviour
     {
-        if (_tower == null || _barrelStand == null || _barrel == null || _tower.CannonType != CannonType.Mortar)
-            return;
+        [FormerlySerializedAs("_basePivot")] [SerializeField] private Transform _barrelStand;
+        [SerializeField] private Transform _barrel;
+        [SerializeField] private CannonTower _tower;
+
+        [SerializeField] private float _turnSpeed = 5f;
+        public Transform Barrel => _barrel;
+        public Transform BarrelStand => _barrelStand;
+    
+        public Vector3 CurrentAimDirection { get; private set; }
+
+
+        void Update()
+        {
+            if (_tower == null || _barrelStand == null || _barrel == null || _tower.CannonType != CannonType.Mortar)
+                return;
 
       
-        Vector3 initialVelocity = CalculateInitialVelocity(
-            _tower.ShootPoint,
-            _tower.InterceptPoint,
-            _tower.GetProjectileSpeed(),
-            _tower.GetProjectileMaxHeight()
-        );
+            Vector3 initialVelocity = CalculateInitialVelocity(
+                _tower.ShootPoint,
+                _tower.InterceptPoint,
+                _tower.GetProjectileSpeed(),
+                _tower.GetProjectileMaxHeight()
+            );
 
-        if (initialVelocity == Vector3.zero)
-            return;
-        CurrentAimDirection = initialVelocity.normalized;
-        Vector3 horizontalDir = new Vector3(initialVelocity.x, 0f, initialVelocity.z);
+            if (initialVelocity == Vector3.zero)
+                return;
+            CurrentAimDirection = initialVelocity.normalized;
+            Vector3 horizontalDir = new Vector3(initialVelocity.x, 0f, initialVelocity.z);
 
-        if (horizontalDir.sqrMagnitude > 0.001f)
-        {
-            Quaternion targetYaw = Quaternion.LookRotation(horizontalDir);
+            if (horizontalDir.sqrMagnitude > 0.001f)
+            {
+                Quaternion targetYaw = Quaternion.LookRotation(horizontalDir);
 
-            _barrelStand.rotation = Quaternion.RotateTowards(
-                _barrelStand.rotation,
-                targetYaw,
+                _barrelStand.rotation = Quaternion.RotateTowards(
+                    _barrelStand.rotation,
+                    targetYaw,
+                    _turnSpeed * Time.deltaTime * 100f
+                );
+            }
+        
+            Vector3 localDir = _barrelStand.InverseTransformDirection(initialVelocity.normalized);
+            float angleX = -1* Mathf.Atan2(localDir.y, localDir.z) * Mathf.Rad2Deg;
+
+            Quaternion targetPitch = Quaternion.Euler(angleX, 0f, 0f);
+
+            _barrel.localRotation = Quaternion.RotateTowards(
+                _barrel.localRotation,
+                targetPitch,
                 _turnSpeed * Time.deltaTime * 100f
             );
         }
-        
-        Vector3 localDir = _barrelStand.InverseTransformDirection(initialVelocity.normalized);
-        float angleX = -1* Mathf.Atan2(localDir.y, localDir.z) * Mathf.Rad2Deg;
 
-        Quaternion targetPitch = Quaternion.Euler(angleX, 0f, 0f);
+        private Vector3 CalculateInitialVelocity(Vector3 startPos, Vector3 targetPos, float speed, float maxHeight)
+        {
+            Vector3 displacement = targetPos - startPos;
+            Vector3 horizontalDisplacement = new Vector3(displacement.x, 0, displacement.z);
 
-        _barrel.localRotation = Quaternion.RotateTowards(
-            _barrel.localRotation,
-            targetPitch,
-            _turnSpeed * Time.deltaTime * 100f
-        );
-    }
+            if (horizontalDisplacement.magnitude < 0.01f)
+                return Vector3.zero;
 
-    private Vector3 CalculateInitialVelocity(Vector3 startPos, Vector3 targetPos, float speed, float maxHeight)
-    {
-        Vector3 displacement = targetPos - startPos;
-        Vector3 horizontalDisplacement = new Vector3(displacement.x, 0, displacement.z);
+            float time = horizontalDisplacement.magnitude / speed;
 
-        if (horizontalDisplacement.magnitude < 0.01f)
-            return Vector3.zero;
+            if (time <= 0.01f)
+                return Vector3.zero;
 
-        float time = horizontalDisplacement.magnitude / speed;
+            float startVy = 2 * (maxHeight - startPos.y) / (time / 2);
+            float gravity = 2 * (startVy * time - displacement.y) / (time * time);
 
-        if (time <= 0.01f)
-            return Vector3.zero;
+            Vector3 horizontalVelocity = horizontalDisplacement / time;
+            Vector3 initialVelocity = horizontalVelocity + Vector3.up * startVy;
 
-        float startVy = 2 * (maxHeight - startPos.y) / (time / 2);
-        float gravity = 2 * (startVy * time - displacement.y) / (time * time);
-
-        Vector3 horizontalVelocity = horizontalDisplacement / time;
-        Vector3 initialVelocity = horizontalVelocity + Vector3.up * startVy;
-
-        return initialVelocity;
+            return initialVelocity;
+        }
     }
 }

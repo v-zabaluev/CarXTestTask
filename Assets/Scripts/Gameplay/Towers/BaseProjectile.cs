@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Gameplay.Towers
 {
-    public abstract class BaseProjectile<T> : MonoBehaviour where T : BaseProjectile<T>
+    public abstract class BaseProjectile<T> : MonoBehaviour, IProjectile where T : BaseProjectile<T>
     {
         protected bool _initialized = false;
         public float Speed { get; protected set; }
@@ -26,5 +26,10 @@ namespace Gameplay.Towers
             yield return new WaitForSeconds(6f);
             DespawnProjectile();
         }
+    }
+
+    public interface IProjectile
+    {
+        public void DespawnProjectile();
     }
 }

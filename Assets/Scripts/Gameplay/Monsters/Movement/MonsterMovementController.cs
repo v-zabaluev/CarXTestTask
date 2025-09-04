@@ -1,7 +1,6 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace Gameplay.Movement
+namespace Gameplay.Monsters.Movement
 {
     public class MonsterMovementController : MonoBehaviour
     {

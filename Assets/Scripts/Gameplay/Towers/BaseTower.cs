@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Gameplay.Movement;
+using Gameplay.Monsters.Movement;
 using UnityEngine;
 
 namespace Gameplay.Towers

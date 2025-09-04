@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using Gameplay.Movement;
+using Gameplay.Monsters;
+using Gameplay.Monsters.Movement;
 using UnityEngine;
 using UnityEngine.Serialization;
 

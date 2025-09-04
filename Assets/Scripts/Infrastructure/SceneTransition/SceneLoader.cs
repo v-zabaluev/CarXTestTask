@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace Infrastructure
+namespace Infrastructure.SceneTransition
 {
     public class SceneLoader
     {

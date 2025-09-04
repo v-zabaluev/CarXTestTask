@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using Gameplay.Monsters;
 using Infrastructure.Pools;
 using UnityEngine;
 using UnityEngine.Pool;

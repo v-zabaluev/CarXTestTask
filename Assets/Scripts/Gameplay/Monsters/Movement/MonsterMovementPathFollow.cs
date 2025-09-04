@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace Gameplay.Movement
+namespace Gameplay.Monsters.Movement
 {
     public class MonsterMovementPathFollow : MonsterMovementBase
     {

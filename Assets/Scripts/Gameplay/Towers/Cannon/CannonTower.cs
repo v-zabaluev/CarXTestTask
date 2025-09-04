@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Gameplay.Movement;
+using Gameplay.Monsters.Movement;
 using Gameplay.Towers.Cannon;
 using Infrastructure.Factory;
 using Services;

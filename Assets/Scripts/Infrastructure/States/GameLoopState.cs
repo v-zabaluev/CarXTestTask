@@ -1,4 +1,6 @@
-﻿namespace Infrastructure.States
+﻿using Infrastructure.SceneTransition;
+
+namespace Infrastructure.States
 {
     public class GameLoopState : IState
     {

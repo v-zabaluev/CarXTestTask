@@ -1,4 +1,5 @@
-﻿using Infrastructure.States;
+﻿using Infrastructure.SceneTransition;
+using Infrastructure.States;
 using UnityEngine;
 
 namespace Infrastructure
