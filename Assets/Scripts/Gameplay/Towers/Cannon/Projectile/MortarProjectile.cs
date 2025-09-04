@@ -1,8 +1,7 @@
 ﻿using Gameplay.Monsters;
-using Infrastructure.Pools;
 using UnityEngine;
 
-namespace Gameplay.Towers.Cannon
+namespace Gameplay.Towers.Cannon.Projectile
 {
     public class MortarProjectile : BaseProjectile<MortarProjectile>
     {

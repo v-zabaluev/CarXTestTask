@@ -5,7 +5,6 @@ using Gameplay.Towers.Cannon;
 using Infrastructure.Factory;
 using Services;
 using StaticData.Projectile;
-using Unity.VisualScripting;
 using UnityEngine;
 
 namespace Gameplay.Towers.Cannon
@@ -14,7 +13,6 @@ namespace Gameplay.Towers.Cannon
     {
         [SerializeField] private Transform _shootPoint;
 
-        //if you initialize through the factory, then there will be no such nonsense.
         [SerializeField] private CannonType _type;
         [SerializeField] private CannonProjectileType _cannonProjectileType;
         [SerializeField] private MortarProjectileType _mortarProjectileType;
@@ -22,82 +20,54 @@ namespace Gameplay.Towers.Cannon
         [SerializeField] private CannonBarrelRotator _barrelRotator;
         [SerializeField] private MortarBarrelRotator _mortarRotator;
 
+        private ITowerShootingMode _shootingMode;
         private Vector3 _projectileDirection;
         private Vector3 _interceptPoint;
 
+        public CannonProjectileType CannonProjectileType => _cannonProjectileType;
+        public MortarProjectileType MortarProjectileType => _mortarProjectileType;
         public Vector3 ProjectileDirection => _projectileDirection;
         public Vector3 InterceptPoint => _interceptPoint;
         public Vector3 ShootPoint => _shootPoint.position;
         public CannonType CannonType => _type;
 
-        public float GetProjectileSpeed()
+        protected override void Awake()
         {
+            base.Awake();
+            
             switch (_type)
             {
                 case CannonType.Cannon:
-                    var cannonData = StaticDataService.GetCannonProjectile(_cannonProjectileType);
+                    _shootingMode = new CannonShootingMode(this, _barrelRotator, _cannonProjectileType);
 
-                    return cannonData != null ? cannonData.Speed : 0f;
+                    break;
                 case CannonType.Mortar:
-                    var mortarData = StaticDataService.GetMortarProjectile(_mortarProjectileType);
+                    _shootingMode = new MortarShootingMode(this, _mortarRotator, _mortarProjectileType);
 
-                    return mortarData != null ? mortarData.Speed : 0f;
-                default:
-                    return 0f;
+                    break;
             }
-        }
-
-        public float GetProjectileMaxHeight()
-        {
-            switch (_type)
-            {
-                case CannonType.Mortar:
-                    var mortarData = StaticDataService.GetMortarProjectile(_mortarProjectileType);
-
-                    return mortarData != null ? mortarData.MaxHeight : 0f;
-                default:
-                    return 0f;
-            }
-        }
-
-        public bool IsCannonAimed(Vector3 targetDirection, Transform barrelTransform, float aimTolerance = 1f)
-        {
-            Vector3 currentDir = barrelTransform.forward;
-            float angle = Vector3.Angle(currentDir, targetDirection);
-
-            return angle <= aimTolerance;
-        }
-
-        public bool IsMortarAimed(Vector3 aimDirection, Transform barrel, float aimTolerance = 2f)
-        {
-            float angle = Vector3.Angle(barrel.forward, aimDirection);
-
-            return angle <= aimTolerance;
         }
 
         private void Update()
         {
             if (_shootPoint == null || _targetsInRange.Count == 0) return;
 
-            MonsterMovementController monsterMovementController = GetValidTargetMovementController();
+            var target = GetValidTargetMovementController();
 
-            if (monsterMovementController == null) return;
+            if (target == null) return;
 
-            if (monsterMovementController.GetInterceptInfo(_shootPoint.position, GetProjectileSpeed(),
+            if (target.GetInterceptInfo(_shootPoint.position, _shootingMode.GetProjectileSpeed(),
                     out _projectileDirection, out _interceptPoint))
             {
                 Debug.DrawRay(_shootPoint.position, _projectileDirection * 30, Color.red, 1f);
 
-                var cannonReady = IsCannonReady();
+                _shootingMode.RotateBarrel(_type == CannonType.Cannon ? _projectileDirection : _interceptPoint);
 
-                var mortarReady = IsMortarReady();
+                if (WillShieldBlock(target)) return;
 
-                if (WillShieldBlock(monsterMovementController))
-                    return;
-
-                if (_lastShotTime + _shootInterval <= Time.time && (cannonReady || mortarReady))
+                if (_shootingMode.IsAimed() && _lastShotTime + _shootInterval <= Time.time)
                 {
-                    Shoot(_projectileDirection);
+                    _shootingMode.Shoot(_projectileDirection);
                     _lastShotTime = Time.time;
                 }
             }
@@ -106,21 +76,20 @@ namespace Gameplay.Towers.Cannon
         private bool WillShieldBlock(MonsterMovementController monsterMovementController)
         {
             var defense = monsterMovementController.GetComponent<MonsterDefenseController>();
+
             if (defense == null) return false;
 
             float projectileRadius = GetProjectileRadius();
 
-            bool blocked = defense.IsInterceptBlocked(
+            return defense.IsInterceptBlocked(
                 projectileRadius,
                 _shootPoint.position,
                 _projectileDirection,
-                GetProjectileSpeed(),
+                _shootingMode.GetProjectileSpeed(),
                 6f
             );
-
-            return blocked;
         }
-        
+
         private float GetProjectileRadius()
         {
             GameObject projectileGO = null;
@@ -129,47 +98,29 @@ namespace Gameplay.Towers.Cannon
             {
                 case CannonType.Cannon:
                     var cannonData = StaticDataService.GetCannonProjectile(_cannonProjectileType);
+
                     if (cannonData != null)
-                        projectileGO = GameFactory.Instance.CreateCannonProjectile(_cannonProjectileType, Vector3.zero, Quaternion.identity, Vector3.zero);
+                        projectileGO = GameFactory.Instance.CreateCannonProjectile(_cannonProjectileType, Vector3.zero,
+                            Quaternion.identity, Vector3.zero);
+
                     break;
 
                 case CannonType.Mortar:
                     var mortarData = StaticDataService.GetMortarProjectile(_mortarProjectileType);
+
                     if (mortarData != null)
-                        projectileGO = GameFactory.Instance.CreateMortarProjectile(_mortarProjectileType, Vector3.zero, Quaternion.identity, Vector3.zero);
+                        projectileGO = GameFactory.Instance.CreateMortarProjectile(_mortarProjectileType, Vector3.zero,
+                            Quaternion.identity, Vector3.zero);
+
                     break;
             }
 
-            if (projectileGO == null)
-                return 0;
+            if (projectileGO == null) return 0f;
 
             SphereCollider collider = projectileGO.GetComponent<SphereCollider>();
             projectileGO.SetActive(false);
+
             return collider.radius;
-        }
-
-
-        private bool IsMortarReady()
-        {
-            bool mortarReady = false;
-
-            if (_type == CannonType.Mortar && _mortarRotator != null)
-            {
-                mortarReady = IsMortarAimed(_mortarRotator.CurrentAimDirection,
-                    _mortarRotator.Barrel);
-            }
-
-            return mortarReady;
-        }
-
-        private bool IsCannonReady()
-        {
-            bool cannonReady = false;
-
-            if (_type == CannonType.Cannon && _barrelRotator != null)
-                cannonReady = IsCannonAimed(_projectileDirection, _barrelRotator.BarrelTransform);
-
-            return cannonReady;
         }
 
         private MonsterMovementController GetValidTargetMovementController()
@@ -177,26 +128,6 @@ namespace Gameplay.Towers.Cannon
             _targetsInRange.RemoveAll(m => m == null);
 
             return _targetsInRange.Count > 0 ? _targetsInRange[0] : null;
-        }
-
-        private void Shoot(Vector3 direction)
-        {
-            Debug.DrawRay(_shootPoint.position, direction * 30, Color.blue, 2f);
-
-            switch (_type)
-            {
-                case CannonType.Cannon:
-                    GameFactory.Instance.CreateCannonProjectile(_cannonProjectileType,
-                        _shootPoint.position, Quaternion.LookRotation(direction), _interceptPoint);
-
-                    break;
-
-                case CannonType.Mortar:
-                    GameFactory.Instance.CreateMortarProjectile(_mortarProjectileType,
-                        _shootPoint.position, Quaternion.LookRotation(direction), _interceptPoint);
-
-                    break;
-            }
         }
     }
 }

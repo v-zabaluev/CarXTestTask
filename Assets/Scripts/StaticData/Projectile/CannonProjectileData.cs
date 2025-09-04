@@ -1,4 +1,5 @@
 ﻿using Gameplay.Towers.Cannon;
+using Gameplay.Towers.Cannon.Projectile;
 using UnityEngine;
 
 namespace StaticData.Projectile

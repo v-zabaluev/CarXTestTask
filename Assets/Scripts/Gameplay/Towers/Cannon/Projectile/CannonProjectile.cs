@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections;
-using Gameplay.Monsters;
-using Infrastructure.Pools;
+﻿using Gameplay.Monsters;
 using UnityEngine;
-using UnityEngine.Pool;
 
-namespace Gameplay.Towers.Cannon
+namespace Gameplay.Towers.Cannon.Projectile
 {
     public class CannonProjectile : BaseProjectile<CannonProjectile>
     {
