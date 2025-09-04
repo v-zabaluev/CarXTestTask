@@ -1,10 +1,7 @@
 ﻿using UnityEngine;
 
-namespace Gameplay
+namespace Gameplay.Shield
 {
-    using UnityEngine;
-    using System;
-
     namespace Gameplay
     {
         public class FlyingShieldProtection : MonoBehaviour

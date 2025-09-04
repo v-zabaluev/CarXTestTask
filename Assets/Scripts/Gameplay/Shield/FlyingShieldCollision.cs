@@ -1,7 +1,7 @@
 ﻿using Gameplay.Towers;
 using UnityEngine;
 
-namespace Gameplay
+namespace Gameplay.Shield
 {
     public class FlyingShieldCollision : MonoBehaviour
     {

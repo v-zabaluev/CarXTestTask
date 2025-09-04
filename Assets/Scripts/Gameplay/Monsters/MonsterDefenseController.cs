@@ -1,4 +1,5 @@
-﻿using Gameplay.Gameplay;
+﻿using Gameplay.Shield;
+using Gameplay.Shield.Gameplay;
 using UnityEngine;
 
 namespace Gameplay.Monsters

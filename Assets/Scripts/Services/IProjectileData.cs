@@ -1,7 +1,10 @@
 ﻿using System;
 
-public interface IProjectileData<TType>
-    where TType : Enum
+namespace Services
 {
-    TType Type { get; }
+    public interface IProjectileData<TType>
+        where TType : Enum
+    {
+        TType Type { get; }
+    }
 }

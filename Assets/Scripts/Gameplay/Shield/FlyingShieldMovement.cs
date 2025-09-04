@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
-using UnityEngine.Serialization;
 
-namespace Gameplay
+namespace Gameplay.Shield
 {
     public class FlyingShieldMovement : MonoBehaviour
     {

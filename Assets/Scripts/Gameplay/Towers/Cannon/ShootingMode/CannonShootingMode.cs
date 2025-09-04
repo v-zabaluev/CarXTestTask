@@ -1,10 +1,11 @@
 ﻿using Gameplay.Towers.Cannon.Projectile;
+using Gameplay.Towers.Cannon.Rotators;
 using Infrastructure.Factory;
 using Services;
 using StaticData.Projectile;
 using UnityEngine;
 
-namespace Gameplay.Towers.Cannon
+namespace Gameplay.Towers.Cannon.ShootingMode
 {
     public class CannonShootingMode : ITowerShootingMode
     {

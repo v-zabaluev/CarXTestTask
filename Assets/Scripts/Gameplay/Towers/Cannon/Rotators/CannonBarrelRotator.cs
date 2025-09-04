@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Gameplay.Towers.Cannon
+namespace Gameplay.Towers.Cannon.Rotators
 {
     public class CannonBarrelRotator : BarrelRotatorBase
     {

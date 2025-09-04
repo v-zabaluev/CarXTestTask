@@ -2,6 +2,8 @@
 using Gameplay.Monsters;
 using Gameplay.Monsters.Movement;
 using Gameplay.Towers.Cannon;
+using Gameplay.Towers.Cannon.Rotators;
+using Gameplay.Towers.Cannon.ShootingMode;
 using Infrastructure.Factory;
 using Services;
 using StaticData.Projectile;

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Gameplay.Towers.Cannon
+namespace Gameplay.Towers.Cannon.ShootingMode
 {
     public interface ITowerShootingMode
     {

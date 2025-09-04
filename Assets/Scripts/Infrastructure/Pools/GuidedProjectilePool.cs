@@ -1,11 +1,10 @@
-﻿using Gameplay.Towers.Cannon;
-using Gameplay.Towers.SimpleTower;
+﻿using Gameplay.Towers.SimpleTower;
 using Services;
 using StaticData.Projectile;
-using UnityEngine.Pool;
 using UnityEngine;
+using UnityEngine.Pool;
 
-namespace Infrastructure.Factory
+namespace Infrastructure.Pools
 {
     public class GuidedProjectilePool
     {

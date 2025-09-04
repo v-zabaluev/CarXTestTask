@@ -23,7 +23,7 @@ namespace Gameplay.Towers
 
         public IEnumerator StartDestroyProcess()
         {
-            yield return new WaitForSeconds(6f);
+            yield return new WaitForSeconds(Constants.MaxPredictionInterceptTime);
             DespawnProjectile();
         }
     }
