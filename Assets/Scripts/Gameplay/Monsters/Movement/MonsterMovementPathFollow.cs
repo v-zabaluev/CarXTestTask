@@ -18,6 +18,7 @@ namespace Gameplay.Monsters.Movement
             if (checkpoints == null || checkpoints.Count == 0)
             {
                 Debug.LogError("Path is empty! Monster cannot move.");
+
                 return;
             }
 
@@ -27,51 +28,13 @@ namespace Gameplay.Monsters.Movement
             transform.position = _checkpoints[_currentIndex].position;
         }
 
-        protected override void Update()
-        {
-            base.Update();
-
-            if (_checkpoints == null || _checkpoints.Count == 0)
-                return;
-
-            if (_currentIndex >= _checkpoints.Count)
-            {
-                Destroy(gameObject);
-                return;
-            }
-
-            var targetPoint = _checkpoints[_currentIndex];
-            float dist = Vector3.Distance(transform.position, targetPoint.position);
-
-            if (dist <= _reachDistance)
-            {
-                _currentIndex++;
-                if (_currentIndex >= _checkpoints.Count)
-                {
-                    Destroy(gameObject);
-                    return;
-                }
-            }
-
-            Move();
-        }
-
-        protected override void Move()
-        {
-            if (_currentIndex >= _checkpoints.Count) return;
-
-            var targetPoint = _checkpoints[_currentIndex];
-            var dir = (targetPoint.position - transform.position).normalized;
-
-            transform.Translate(dir * _speed * Time.deltaTime, Space.World);
-        }
-
         public override Vector3 GetSpeedVector()
         {
             if (_checkpoints == null || _checkpoints.Count == 0 || _currentIndex >= _checkpoints.Count)
                 return Vector3.zero;
 
             var targetPoint = _checkpoints[_currentIndex];
+
             return (targetPoint.position - transform.position).normalized * _speed;
         }
 
@@ -103,6 +66,7 @@ namespace Gameplay.Monsters.Movement
                 float c = Vector3.Dot(displacement, displacement);
 
                 float discriminant = b * b - 4 * a * c;
+
                 if (discriminant >= 0f)
                 {
                     float sqrtD = Mathf.Sqrt(discriminant);
@@ -115,12 +79,14 @@ namespace Gameplay.Monsters.Movement
                     if (t >= 0f)
                     {
                         Vector3 predictedPos = currentPos + velocity * t;
-                        
+
                         float traveled = (predictedPos - currentPos).magnitude;
+
                         if (traveled <= segmentLength + 0.01f)
                         {
                             interceptPoint = predictedPos;
                             direction = (interceptPoint - shooterPos).normalized;
+
                             return true;
                         }
                     }
@@ -129,6 +95,61 @@ namespace Gameplay.Monsters.Movement
                 currentPos = targetPoint;
                 index++;
             }
+
+            return false;
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (IsPathNull())
+                return;
+
+            var targetPoint = _checkpoints[_currentIndex];
+            float dist = Vector3.Distance(transform.position, targetPoint.position);
+
+            if (dist <= _reachDistance)
+            {
+                _currentIndex++;
+            }
+
+            if (CheckPathCompleted())
+            {
+                Destroy(gameObject);
+
+                return;
+            }
+
+            Move();
+        }
+
+        protected override void Move()
+        {
+            if (_currentIndex >= _checkpoints.Count) return;
+
+            var targetPoint = _checkpoints[_currentIndex];
+            var dir = (targetPoint.position - transform.position).normalized;
+
+            transform.Translate(dir * _speed * Time.deltaTime, Space.World);
+        }
+
+        private bool CheckPathCompleted()
+        {
+            if (_currentIndex >= _checkpoints.Count)
+            {
+                Destroy(gameObject);
+
+                return true;
+            }
+
+            return false;
+        }
+
+        private bool IsPathNull()
+        {
+            if (_checkpoints == null || _checkpoints.Count == 0)
+                return true;
 
             return false;
         }

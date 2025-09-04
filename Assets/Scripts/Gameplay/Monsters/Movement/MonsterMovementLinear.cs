@@ -6,26 +6,12 @@ namespace Gameplay.Monsters.Movement
     {
         [SerializeField] private float _reachDistance = 0.3f;
         [SerializeField] private float _speed = 10f;
-        public float Speed => _speed;
-        protected override void Update()
-        {
-            base.Update();
-            if (Vector3.Distance(transform.position, _target.transform.position) <= _reachDistance)
-            {
-                Destroy(gameObject);
-            }
-        }
-        protected override void Move()
-        {
-            var translation = (_target.transform.position - transform.position).normalized;
-            transform.Translate(translation * _speed * Time.fixedDeltaTime);
-        }
 
         public override Vector3 GetSpeedVector()
         {
             return (_target.transform.position - transform.position).normalized * _speed;
         }
-    
+
         public override bool CalculateIntercept(Vector3 shooterPos, float projectileSpeed,
             out Vector3 direction, out Vector3 interceptPoint)
         {
@@ -61,6 +47,21 @@ namespace Gameplay.Monsters.Movement
             interceptPoint = transform.position + velocity * t;
             direction = (interceptPoint - shooterPos).normalized;
             return true;
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+            if (Vector3.Distance(transform.position, _target.transform.position) <= _reachDistance)
+            {
+                Destroy(gameObject);
+            }
+        }
+
+        protected override void Move()
+        {
+            var translation = (_target.transform.position - transform.position).normalized;
+            transform.Translate(translation * _speed * Time.fixedDeltaTime);
         }
     }
 }

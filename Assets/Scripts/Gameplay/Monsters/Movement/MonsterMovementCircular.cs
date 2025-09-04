@@ -1,11 +1,11 @@
-﻿using UnityEngine;
+﻿using DefaultNamespace;
+using UnityEngine;
 
 namespace Gameplay.Monsters.Movement
 {
     public class MonsterMovementCircular : MonsterMovementBase
     {
         private const float CalculateInterceptTimeStep = 0.01f;
-        private const float MaxPredictionInterceptTime = 6f; // Max flight time
 
         [SerializeField] private float _angularSpeed = 90f;
         [SerializeField] private float _radius = 3f;
@@ -34,25 +34,6 @@ namespace Gameplay.Monsters.Movement
             }
         }
 
-        protected override void Move()
-        {
-            if (_target == null) return;
-
-            _targetXZ.x = _target.position.x;
-            _targetXZ.z = _target.position.z;
-
-            _angle += _angularSpeed * Mathf.Deg2Rad * Time.fixedDeltaTime;
-
-            float x = Mathf.Cos(_angle) * _radius;
-            float z = Mathf.Sin(_angle) * _radius;
-
-            transform.position = new Vector3(
-                _targetXZ.x + x,
-                _initialY,
-                _targetXZ.z + z
-            );
-        }
-
         public override Vector3 GetSpeedVector()
         {
             float vx = -Mathf.Sin(_angle) * _radius * _angularSpeed * Mathf.Deg2Rad;
@@ -64,9 +45,7 @@ namespace Gameplay.Monsters.Movement
         public override bool CalculateIntercept(Vector3 shooterPos, float projectileSpeed,
             out Vector3 direction, out Vector3 interceptPoint)
         {
-            for (float t = CalculateInterceptTimeStep;
-                 t < MaxPredictionInterceptTime;
-                 t += CalculateInterceptTimeStep)
+            for (float t = CalculateInterceptTimeStep; t < Constants.MaxPredictionInterceptTime; t += CalculateInterceptTimeStep)
             {
                 float futureAngle = _angle + _angularSpeed * Mathf.Deg2Rad * t;
 
@@ -95,6 +74,25 @@ namespace Gameplay.Monsters.Movement
             interceptPoint = Vector3.zero;
 
             return false;
+        }
+
+        protected override void Move()
+        {
+            if (_target == null) return;
+
+            _targetXZ.x = _target.position.x;
+            _targetXZ.z = _target.position.z;
+
+            _angle += _angularSpeed * Mathf.Deg2Rad * Time.fixedDeltaTime;
+
+            float x = Mathf.Cos(_angle) * _radius;
+            float z = Mathf.Sin(_angle) * _radius;
+
+            transform.position = new Vector3(
+                _targetXZ.x + x,
+                _initialY,
+                _targetXZ.z + z
+            );
         }
     }
 }
