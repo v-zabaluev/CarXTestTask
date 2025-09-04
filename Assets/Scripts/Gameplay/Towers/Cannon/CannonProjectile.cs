@@ -9,9 +9,7 @@ namespace Gameplay.Towers.Cannon
 {
     public class CannonProjectile : BaseProjectile<CannonProjectile>
     {
-        //public Action<BaseProjectile> OnDespawn;
-
-        public override void Initialize(Vector3 targetPosition, float speed,
+        public override void Initialize(float speed,
             int damage, float maxHeight = 0f)
         {
             Speed = speed;

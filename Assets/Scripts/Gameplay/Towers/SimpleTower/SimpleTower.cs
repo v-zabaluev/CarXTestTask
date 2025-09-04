@@ -1,4 +1,6 @@
 ﻿using Gameplay.Monsters.Movement;
+using Infrastructure.Factory;
+using StaticData.Projectile;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -6,36 +8,27 @@ namespace Gameplay.Towers.SimpleTower
 {
     public class SimpleTower : BaseTower
     {
-        public GuidedProjectile _projectilePrefab;
+        [SerializeField] private GuidedProjectileType _projectileType;
 
-        [SerializeField] private float _projectileSpeed = 0.2f;
-        [SerializeField] private int _projectileDamage = 10;
         private void Update()
         {
-            if (_projectilePrefab == null)
-                return;
-
             if (_targetsInRange.Count == 0) return;
 
-            MonsterMovementController  monster = GetValidTarget();
+            MonsterMovementController monster = GetValidTarget();
 
             if (monster == null) return;
 
             if (_lastShotTime + _shootInterval <= Time.time)
             {
                 // shot
-                var projectile =
-                    Instantiate(_projectilePrefab, transform.position + Vector3.up * 1.5f,
-                        Quaternion.identity);
-
-                var projectileBeh = projectile.GetComponent<GuidedProjectile>();
-                projectileBeh.Initialize(monster.gameObject.transform.position, _projectileSpeed, _projectileDamage);
+                var projectile = GameFactory.Instance.CreateGuidedProjectile(_projectileType,
+                    transform.position + Vector3.up * 1.5f, Quaternion.identity, monster.gameObject.transform);
 
                 _lastShotTime = Time.time;
             }
         }
 
-        private MonsterMovementController  GetValidTarget()
+        private MonsterMovementController GetValidTarget()
         {
             _targetsInRange.RemoveAll(m => m == null);
 

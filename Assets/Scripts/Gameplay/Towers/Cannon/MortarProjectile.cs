@@ -10,14 +10,15 @@ namespace Gameplay.Towers.Cannon
         private float _gravity;
         private float _maxHeight;
 
+        private Vector3 _targetPosition;
         public Vector3 Velocity => _velocity;
-        public override void Initialize(Vector3 targetPosition, float speed, int damage, float maxHeight = 0f)
+        public override void Initialize(float speed, int damage, float maxHeight = 0f)
         {
             Speed = speed;
             Damage = damage;
             _maxHeight = maxHeight;
 
-            Vector3 displacement = targetPosition - transform.position;
+            Vector3 displacement = _targetPosition - transform.position;
             Vector3 horizontalDisplacement = new Vector3(displacement.x, 0, displacement.z);
 
             float time = horizontalDisplacement.magnitude / Speed;
@@ -28,6 +29,11 @@ namespace Gameplay.Towers.Cannon
             _velocity = horizontalVelocity + Vector3.up * startVy;
             _initialized = true;
             StartCoroutine(StartDestroyProcess());
+        }
+
+        public void SetTargetPosition(Vector3 targetPosition)
+        {
+            _targetPosition = targetPosition;
         }
 
         private void FixedUpdate()

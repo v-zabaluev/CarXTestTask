@@ -12,7 +12,7 @@ namespace Gameplay.Towers
         public int Damage { get; protected set; }
         public Action<T> OnDespawn;
 
-        public abstract void Initialize(Vector3 targetPosition, float speed, int damage, float maxHeight = 0f);
+        public abstract void Initialize(float speed, int damage, float maxHeight = 0f);
 
         public void DespawnProjectile()
         {

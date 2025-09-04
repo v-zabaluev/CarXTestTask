@@ -6,22 +6,31 @@ namespace Gameplay.Towers.SimpleTower
 {
     public class GuidedProjectile : BaseProjectile<GuidedProjectile>
     {
-        private Vector3 _targetPosition;
+        private Transform _target;
 
-        public override void Initialize(Vector3 targetPosition, float speed, int damage, float maxHeight = 0f)
+        public override void Initialize(float speed, int damage, float maxHeight = 0f)
         {
             _initialized = true;
-            _targetPosition = targetPosition;
             Speed = speed;
             Damage = damage;
             StartCoroutine(StartDestroyProcess());
+        }
+
+        public void SetTargetTransform(Transform targetTransform)
+        {
+            _target = targetTransform;
         }
 
         private void Update()
         {
             if (!_initialized) return;
 
-            transform.position = Vector3.MoveTowards(transform.position, _targetPosition, Speed * Time.deltaTime);
+            if (_target == null)
+            {
+                DespawnProjectile();
+                return;
+            }
+            transform.position = Vector3.MoveTowards(transform.position, _target.position, Speed * Time.deltaTime);
         }
 
         private void OnTriggerEnter(Collider other)
