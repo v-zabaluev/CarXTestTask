@@ -11,5 +11,7 @@ namespace Infrastructure.Factory
 
         GameObject CreateMortarProjectile(MortarProjectileType type, Vector3 spawnPosition, Quaternion rotation,
             Vector3 targetPosition);
+
+        GameObject CreateGuidedProjectile(GuidedProjectileType type, Vector3 spawnPosition, Quaternion rotation, Transform target);
     }
 }

@@ -22,16 +22,28 @@ namespace Services
             _mortarProjectiles = new Dictionary<MortarProjectileType, MortarProjectileData>();
             _guidedProjectiles = new Dictionary<GuidedProjectileType, GuidedProjectileData>();
 
-            CannonProjectileData[] cannons = Resources.LoadAll<CannonProjectileData>(PathToCannon);
+            LoadCannonProjectileData();
 
-            foreach (var cannon in cannons)
+            LoadMortarProjectileData();
+
+            LoadGuidedProjectileData();
+        }
+
+        private static void LoadGuidedProjectileData()
+        {
+            GuidedProjectileData[] guideds = Resources.LoadAll<GuidedProjectileData>(PathToGuided);
+
+            foreach (var guided in guideds)
             {
-                if (System.Enum.TryParse(cannon.name, out CannonProjectileType type))
+                if (System.Enum.TryParse(guided.name, out GuidedProjectileType type))
                 {
-                    _cannonProjectiles[type] = cannon;
+                    _guidedProjectiles[type] = guided;
                 }
             }
+        }
 
+        private static void LoadMortarProjectileData()
+        {
             MortarProjectileData[] mortars = Resources.LoadAll<MortarProjectileData>(PathToMortar);
 
             foreach (var mortar in mortars)
@@ -41,14 +53,17 @@ namespace Services
                     _mortarProjectiles[type] = mortar;
                 }
             }
+        }
 
-            GuidedProjectileData[] guideds = Resources.LoadAll<GuidedProjectileData>(PathToGuided);
+        private static void LoadCannonProjectileData()
+        {
+            CannonProjectileData[] cannons = Resources.LoadAll<CannonProjectileData>(PathToCannon);
 
-            foreach (var guided in guideds)
+            foreach (var cannon in cannons)
             {
-                if (System.Enum.TryParse(guided.name, out GuidedProjectileType type))
+                if (System.Enum.TryParse(cannon.name, out CannonProjectileType type))
                 {
-                    _guidedProjectiles[type] = guided;
+                    _cannonProjectiles[type] = cannon;
                 }
             }
         }
