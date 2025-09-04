@@ -12,7 +12,6 @@ namespace Gameplay
         [SerializeField] private MonsterMovementType _monsterMovementType;
 
         [SerializeField] private float _interval = 3;
-        [SerializeField] private FlyingShield _flyingShieldPrefab;
 
         [Header("Monster Prefabs")]
 
@@ -37,9 +36,6 @@ namespace Gameplay
             if (Time.time > _lastSpawn + _interval)
             {
                 GameObject monster = Spawn();
-
-                if (_flyingShieldPrefab != null)
-                    Instantiate(_flyingShieldPrefab, monster.transform);
 
                 _lastSpawn = Time.time;
             }
