@@ -14,6 +14,7 @@ namespace Gameplay
         [SerializeField] private Vector3 _offset = new Vector3(0, 1f, 0);
 
         [SerializeField] private Transform _shielded;
+        
         private Vector3 _axis;
         private Vector3 _initialDirection;
         private float _angle = 0f;
@@ -24,34 +25,13 @@ namespace Gameplay
 
         private void Start()
         {
-            if (_shielded == null)
-            {
-                Debug.LogError("FlyingShield: Родительский объект не назначен!");
-                enabled = false;
-
+            if (HasShieldedObject())
                 return;
-            }
 
-            if (_lookDirection.sqrMagnitude < 1e-6f)
-            {
-                Debug.LogError("FlyingShield: Направление поворота не может быть нулевым вектором!");
-                enabled = false;
-
+            if (IsLookDirectionCorrect())
                 return;
-            }
 
-            _lookDirection.Normalize();
-
-            _axis = _shielded.TransformDirection(_localAxis);
-
-            Vector3 perpendicular = Vector3.Cross(_axis, Vector3.up);
-
-            if (perpendicular.sqrMagnitude < 1e-6f)
-            {
-                perpendicular = Vector3.Cross(_axis, Vector3.forward);
-            }
-
-            perpendicular.Normalize();
+            var perpendicular = GetPerpendicularAxis();
             _initialDirection = perpendicular;
 
             transform.position = _shielded.position + _offset + _initialDirection * _radius;
@@ -70,6 +50,50 @@ namespace Gameplay
             transform.position = _shielded.position + _offset + currentDirection * _radius;
 
             UpdateRotation();
+        }
+
+        private bool HasShieldedObject()
+        {
+            if (_shielded == null)
+            {
+                Debug.LogError("FlyingShield: Родительский объект не назначен!");
+                enabled = false;
+
+                return true;
+            }
+
+            return false;
+        }
+
+        private bool IsLookDirectionCorrect()
+        {
+            if (_lookDirection.sqrMagnitude < 1e-6f)
+            {
+                Debug.LogError("FlyingShield: Направление поворота не может быть нулевым вектором!");
+                enabled = false;
+
+                return true;
+            }
+
+            return false;
+        }
+
+        private Vector3 GetPerpendicularAxis()
+        {
+            _lookDirection.Normalize();
+
+            _axis = _shielded.TransformDirection(_localAxis);
+
+            Vector3 perpendicular = Vector3.Cross(_axis, Vector3.up);
+
+            if (perpendicular.sqrMagnitude < 1e-6f)
+            {
+                perpendicular = Vector3.Cross(_axis, Vector3.forward);
+            }
+
+            perpendicular.Normalize();
+
+            return perpendicular;
         }
 
         private void UpdateRotation()
