@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Gameplay.Monsters.Movement
+namespace Gameplay.Monsters.Movement.MovementVariants
 {
     public abstract class MonsterMovementBase : MonoBehaviour
     {

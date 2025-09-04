@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace Gameplay.Monsters.Movement
+namespace Gameplay.Monsters.Movement.MovementVariants
 {
     public class MonsterMovementPathFollow : MonsterMovementBase
     {
@@ -10,9 +10,7 @@ namespace Gameplay.Monsters.Movement
 
         private List<Transform> _checkpoints;
         private int _currentIndex = 0;
-
-        public float Speed => _speed;
-
+        
         public void SetPath(List<Transform> checkpoints)
         {
             if (checkpoints == null || checkpoints.Count == 0)
@@ -24,8 +22,6 @@ namespace Gameplay.Monsters.Movement
 
             _checkpoints = checkpoints;
             _currentIndex = 0;
-
-            transform.position = _checkpoints[_currentIndex].position;
         }
 
         public override Vector3 GetSpeedVector()

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Gameplay.Monsters.Movement.MovementVariants;
+using UnityEngine;
 
 namespace Gameplay.Monsters.Movement
 {
