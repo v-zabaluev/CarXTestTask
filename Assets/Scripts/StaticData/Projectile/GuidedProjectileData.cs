@@ -5,9 +5,10 @@ using UnityEngine;
 namespace StaticData.Projectile
 {
     [CreateAssetMenu(fileName = "GuidedProjectile", menuName = "StaticData/Projectile/Guided")]
-    public class GuidedProjectileData : ScriptableObject
+    public class GuidedProjectileData : ScriptableObject, IProjectileData<GuidedProjectileType>
     {
-        public GuidedProjectileType Type;
+        [SerializeField] private GuidedProjectileType _type;
+        public GuidedProjectileType Type => _type;
         public GuidedProjectile Prefab;
         public float Speed = 20;
         public int Damage = 10;

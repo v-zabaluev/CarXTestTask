@@ -9,15 +9,18 @@ namespace Gameplay.Towers.Cannon
     public class CannonShootingMode : ITowerShootingMode
     {
         private readonly CannonBarrelRotator _rotator;
-        private readonly CannonProjectileType _cannonProjectileType;
+        private readonly CannonProjectileType _projectileType;
         private readonly CannonTower _tower;
-
+        
+        private readonly CannonProjectileData _data;
         public CannonShootingMode(CannonTower tower, CannonBarrelRotator rotator,
-            CannonProjectileType cannonProjectileType)
+            CannonProjectileType projectileType)
         {
             _tower = tower;
             _rotator = rotator;
-            _cannonProjectileType = cannonProjectileType;
+            _projectileType = projectileType;
+            
+            _data = StaticDataService.GetProjectile<CannonProjectileData, CannonProjectileType>(_projectileType);
         }
 
         public void RotateBarrel(Vector3 targetPoint)
@@ -38,9 +41,8 @@ namespace Gameplay.Towers.Cannon
 
         public float GetProjectileSpeed()
         {
-            var cannonData = StaticDataService.GetCannonProjectile(_cannonProjectileType);
 
-            return cannonData != null ? cannonData.Speed : 0f;
+            return _data != null ? _data.Speed : 0f;
         }
 
         private bool IsCannonAimed(Vector3 targetDirection, Transform barrelTransform, float aimTolerance = 1f)
@@ -53,10 +55,9 @@ namespace Gameplay.Towers.Cannon
         public float GetProjectileRadius()
         {
             GameObject projectileGO = null;
-            var mortarData = StaticDataService.GetCannonProjectile(_cannonProjectileType);
 
-            if (mortarData != null)
-                projectileGO = GameFactory.Instance.CreateCannonProjectile(_cannonProjectileType, Vector3.zero,
+            if (_data != null)
+                projectileGO = GameFactory.Instance.CreateCannonProjectile(_projectileType, Vector3.zero,
                     Quaternion.identity, Vector3.zero);
             if (projectileGO == null) return 0f;
 

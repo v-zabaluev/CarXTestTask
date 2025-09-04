@@ -11,12 +11,12 @@ namespace Infrastructure.Factory
     {
         private readonly ObjectPool<GuidedProjectile> _pool;
 
-        public GuidedProjectilePool(GuidedProjectileType defaultType = GuidedProjectileType.Base, int capacity = 10)
+        public GuidedProjectilePool(GuidedProjectileType type = GuidedProjectileType.Base, int capacity = 10)
         {
             _pool = new ObjectPool<GuidedProjectile>(
                 createFunc: () =>
                 {
-                    var data = StaticDataService.GetGuidedProjectile(defaultType);
+                    var data = StaticDataService.GetProjectile<GuidedProjectileData, GuidedProjectileType>(type);
                     var go = Object.Instantiate(data.Prefab.gameObject);
                     var projectile = go.GetComponent<GuidedProjectile>();
                     go.SetActive(false);
@@ -34,7 +34,7 @@ namespace Infrastructure.Factory
         public GuidedProjectile Get(Vector3 spawnPosition, Quaternion rotation, Transform target,
             GuidedProjectileType type)
         {
-            var data = StaticDataService.GetGuidedProjectile(type);
+            var data = StaticDataService.GetProjectile<GuidedProjectileData, GuidedProjectileType>(type);
 
             if (data == null) return null;
 

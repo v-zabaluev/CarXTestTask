@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using Gameplay.Towers.Cannon;
-using Gameplay.Towers.SimpleTower;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using StaticData.Projectile;
 using UnityEngine;
 
@@ -8,79 +8,40 @@ namespace Services
 {
     public static class StaticDataService
     {
-        private const string PathToMortar = "StaticData/Projectiles/Mortar";
-        private const string PathToCannon = "StaticData/Projectiles/Cannon";
-        private const string PathToGuided = "StaticData/Projectiles/Guided";
-
-        private static Dictionary<CannonProjectileType, CannonProjectileData> _cannonProjectiles;
-        private static Dictionary<MortarProjectileType, MortarProjectileData> _mortarProjectiles;
-        private static Dictionary<GuidedProjectileType, GuidedProjectileData> _guidedProjectiles;
+        private static readonly Dictionary<Type, IDictionary> _dataCache = new();
 
         public static void LoadAll()
         {
-            _cannonProjectiles = new Dictionary<CannonProjectileType, CannonProjectileData>();
-            _mortarProjectiles = new Dictionary<MortarProjectileType, MortarProjectileData>();
-            _guidedProjectiles = new Dictionary<GuidedProjectileType, GuidedProjectileData>();
-
-            LoadCannonProjectileData();
-
-            LoadMortarProjectileData();
-
-            LoadGuidedProjectileData();
+            LoadProjectileData<CannonProjectileData, CannonProjectileType>("StaticData/Projectiles/Cannon");
+            LoadProjectileData<MortarProjectileData, MortarProjectileType>("StaticData/Projectiles/Mortar");
+            LoadProjectileData<GuidedProjectileData, GuidedProjectileType>("StaticData/Projectiles/Guided");
         }
 
-        private static void LoadGuidedProjectileData()
+        private static void LoadProjectileData<TData, TType>(string path)
+            where TData : ScriptableObject, IProjectileData<TType>
+            where TType : Enum
         {
-            GuidedProjectileData[] guideds = Resources.LoadAll<GuidedProjectileData>(PathToGuided);
+            TData[] dataArray = Resources.LoadAll<TData>(path);
+            var dict = new Dictionary<TType, TData>();
 
-            foreach (var guided in guideds)
+            foreach (var data in dataArray)
             {
-                if (System.Enum.TryParse(guided.name, out GuidedProjectileType type))
-                {
-                    _guidedProjectiles[type] = guided;
-                }
+                dict[data.Type] = data;
             }
+
+            _dataCache[typeof(TData)] = dict;
         }
 
-        private static void LoadMortarProjectileData()
+        public static TData GetProjectile<TData, TType>(TType type)
+            where TData : ScriptableObject, IProjectileData<TType>
+            where TType : Enum
         {
-            MortarProjectileData[] mortars = Resources.LoadAll<MortarProjectileData>(PathToMortar);
-
-            foreach (var mortar in mortars)
+            if (_dataCache.TryGetValue(typeof(TData), out var dictObj) && dictObj is Dictionary<TType, TData> dict)
             {
-                if (System.Enum.TryParse(mortar.name, out MortarProjectileType type))
-                {
-                    _mortarProjectiles[type] = mortar;
-                }
+                return dict.TryGetValue(type, out var data) ? data : null;
             }
-        }
 
-        private static void LoadCannonProjectileData()
-        {
-            CannonProjectileData[] cannons = Resources.LoadAll<CannonProjectileData>(PathToCannon);
-
-            foreach (var cannon in cannons)
-            {
-                if (System.Enum.TryParse(cannon.name, out CannonProjectileType type))
-                {
-                    _cannonProjectiles[type] = cannon;
-                }
-            }
-        }
-
-        public static CannonProjectileData GetCannonProjectile(CannonProjectileType type)
-        {
-            return _cannonProjectiles.TryGetValue(type, out var data) ? data : null;
-        }
-
-        public static MortarProjectileData GetMortarProjectile(MortarProjectileType type)
-        {
-            return _mortarProjectiles.TryGetValue(type, out var data) ? data : null;
-        }
-
-        public static GuidedProjectileData GetGuidedProjectile(GuidedProjectileType type)
-        {
-            return _guidedProjectiles.TryGetValue(type, out var data) ? data : null;
+            return null;
         }
     }
 }

@@ -2,6 +2,7 @@
 using Gameplay.Towers.Cannon.Projectile;
 using Services;
 using StaticData.Projectile;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Pool;
 
@@ -11,12 +12,12 @@ namespace Infrastructure.Pools
     {
         private readonly ObjectPool<MortarProjectile> _pool;
 
-        public MortarProjectilePool(MortarProjectileType defaultType = MortarProjectileType.Base, int capacity = 10)
+        public MortarProjectilePool(MortarProjectileType type = MortarProjectileType.Base, int capacity = 10)
         {
             _pool = new ObjectPool<MortarProjectile>(
                 createFunc: () =>
                 {
-                    var data = StaticDataService.GetMortarProjectile(defaultType);
+                    var data = StaticDataService.GetProjectile<MortarProjectileData, MortarProjectileType>(type);
                     var go = Object.Instantiate(data.Prefab.gameObject);
                     var projectile = go.GetComponent<MortarProjectile>();
                     go.SetActive(false);
@@ -32,7 +33,7 @@ namespace Infrastructure.Pools
 
         public MortarProjectile Get(Vector3 spawnPosition, Quaternion rotation, Vector3 targetPosition, MortarProjectileType type)
         {
-            var data = StaticDataService.GetMortarProjectile(type);
+            var data = StaticDataService.GetProjectile<MortarProjectileData, MortarProjectileType>(type);
             if (data == null) return null;
 
             var projectile = _pool.Get();

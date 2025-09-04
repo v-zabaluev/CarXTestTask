@@ -12,11 +12,14 @@ namespace Gameplay.Towers.Cannon
         private readonly MortarProjectileType _projectileType;
         private readonly CannonTower _tower;
 
+        private readonly MortarProjectileData _data;
+
         public MortarShootingMode(CannonTower tower, MortarBarrelRotator rotator, MortarProjectileType projectileType)
         {
             _tower = tower;
             _rotator = rotator;
             _projectileType = projectileType;
+            _data = StaticDataService.GetProjectile<MortarProjectileData, MortarProjectileType>(_projectileType);
         }
 
         public void RotateBarrel(Vector3 targetPoint)
@@ -31,9 +34,7 @@ namespace Gameplay.Towers.Cannon
 
         public float GetProjectileSpeed()
         {
-            var mortarData = StaticDataService.GetMortarProjectile(_projectileType);
-
-            return mortarData != null ? mortarData.Speed : 0f;
+            return _data != null ? _data.Speed : 0f;
         }
 
         public void Shoot(Vector3 targetPoint)
@@ -45,11 +46,11 @@ namespace Gameplay.Towers.Cannon
         public float GetProjectileRadius()
         {
             GameObject projectileGO = null;
-            var mortarData = StaticDataService.GetMortarProjectile(_projectileType);
 
-            if (mortarData != null)
+            if (_data != null)
                 projectileGO = GameFactory.Instance.CreateMortarProjectile(_projectileType, Vector3.zero,
                     Quaternion.identity, Vector3.zero);
+
             if (projectileGO == null) return 0f;
 
             SphereCollider collider = projectileGO.GetComponent<SphereCollider>();
@@ -67,9 +68,7 @@ namespace Gameplay.Towers.Cannon
 
         private float GetProjectileMaxHeight()
         {
-            var mortarData = StaticDataService.GetMortarProjectile(_projectileType);
-
-            return mortarData != null ? mortarData.MaxHeight : 0f;
+            return _data != null ? _data.MaxHeight : 0f;
         }
     }
 }

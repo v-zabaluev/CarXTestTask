@@ -12,12 +12,12 @@ namespace Infrastructure.Pools
     {
         private readonly ObjectPool<CannonProjectile> _pool;
 
-        public CannonProjectilePool(CannonProjectileType defaultType = CannonProjectileType.Base, int capacity = 10)
+        public CannonProjectilePool(CannonProjectileType type = CannonProjectileType.Base, int capacity = 10)
         {
             _pool = new ObjectPool<CannonProjectile>(
                 createFunc: () =>
                 {
-                    var data = StaticDataService.GetCannonProjectile(defaultType);
+                    var data = StaticDataService.GetProjectile<CannonProjectileData, CannonProjectileType>(type);
                     var go = Object.Instantiate(data.Prefab.gameObject);
                     var projectile = go.GetComponent<CannonProjectile>();
                     go.SetActive(false);
@@ -35,7 +35,7 @@ namespace Infrastructure.Pools
         public CannonProjectile Get(Vector3 spawnPosition, Quaternion rotation, Vector3 targetPosition,
             CannonProjectileType type)
         {
-            var data = StaticDataService.GetCannonProjectile(type);
+            var data = StaticDataService.GetProjectile<CannonProjectileData, CannonProjectileType>(type);
 
             if (data == null) return null;
 
