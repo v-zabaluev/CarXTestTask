@@ -108,11 +108,10 @@ namespace Gameplay.Towers.Cannon
             var defense = monsterMovementController.GetComponent<MonsterDefenseController>();
             if (defense == null) return false;
 
-            Collider projectileCollider = GetProjectileCollider();
-            if (projectileCollider == null) return false;
+            float projectileRadius = GetProjectileRadius();
 
             bool blocked = defense.IsInterceptBlocked(
-                projectileCollider,
+                projectileRadius,
                 _shootPoint.position,
                 _projectileDirection,
                 GetProjectileSpeed(),
@@ -122,7 +121,7 @@ namespace Gameplay.Towers.Cannon
             return blocked;
         }
         
-        private Collider GetProjectileCollider()
+        private float GetProjectileRadius()
         {
             GameObject projectileGO = null;
 
@@ -142,11 +141,11 @@ namespace Gameplay.Towers.Cannon
             }
 
             if (projectileGO == null)
-                return null;
+                return 0;
 
-            Collider collider = projectileGO.GetComponent<Collider>();
+            SphereCollider collider = projectileGO.GetComponent<SphereCollider>();
             projectileGO.SetActive(false);
-            return collider;
+            return collider.radius;
         }
 
 
