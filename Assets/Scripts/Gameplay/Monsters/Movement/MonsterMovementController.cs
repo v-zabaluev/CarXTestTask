@@ -30,6 +30,8 @@ namespace Gameplay.Monsters.Movement
             if (_circularRoutine != null)
             {
                 StopCoroutine(_circularRoutine);
+                _linear.StopMoveToPoint();
+                ApplyMovementType(MonsterMovementType.Circular);
             }
 
             if (newType == MonsterMovementType.Circular && _circular != null)
