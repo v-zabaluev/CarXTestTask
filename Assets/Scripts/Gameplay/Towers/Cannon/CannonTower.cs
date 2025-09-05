@@ -37,6 +37,13 @@ namespace Gameplay.Towers.Cannon
         {
             base.Awake();
 
+            SetCannonMode(_type);
+        }
+
+        public void SetCannonMode(CannonType type)
+        {
+            _type = type;
+
             switch (_type)
             {
                 case CannonType.Cannon:
