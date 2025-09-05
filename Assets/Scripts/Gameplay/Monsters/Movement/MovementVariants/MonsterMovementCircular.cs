@@ -44,7 +44,9 @@ namespace Gameplay.Monsters.Movement.MovementVariants
         public override bool CalculateIntercept(Vector3 shooterPos, float projectileSpeed,
             out Vector3 direction, out Vector3 interceptPoint)
         {
-            for (float t = CalculateInterceptTimeStep; t < Constants.MaxPredictionInterceptTime; t += CalculateInterceptTimeStep)
+            for (float t = CalculateInterceptTimeStep;
+                 t < Constants.MaxPredictionInterceptTime;
+                 t += CalculateInterceptTimeStep)
             {
                 float futureAngle = _angle + _angularSpeed * Mathf.Deg2Rad * t;
 
@@ -73,6 +75,31 @@ namespace Gameplay.Monsters.Movement.MovementVariants
             interceptPoint = Vector3.zero;
 
             return false;
+        }
+
+        public bool IsOnOrbit(Vector3 position)
+        {
+            if (_target == null) return false;
+
+            float distance = Vector3.Distance(
+                new Vector3(position.x, 0f, position.z),
+                new Vector3(_target.position.x, 0f, _target.position.z)
+            );
+
+            return Mathf.Abs(distance - _radius) <= _tolerance;
+        }
+        
+        public Vector3 GetClosestOrbitPoint(Vector3 currentPos)
+        {
+            if (_target == null) return currentPos;
+
+            Vector3 centerXZ = new Vector3(_target.position.x, 0f, _target.position.z);
+            Vector3 currentXZ = new Vector3(currentPos.x, 0f, currentPos.z);
+
+            Vector3 dir = (currentXZ - centerXZ).normalized;
+            Vector3 orbitPoint = centerXZ + dir * _radius;
+
+            return new Vector3(orbitPoint.x, currentPos.y, orbitPoint.z);
         }
 
         protected override void Move()

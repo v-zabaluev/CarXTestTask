@@ -19,7 +19,7 @@ namespace Gameplay.Monsters.Movement.MovementVariants
 
         protected abstract void Move();
 
-        private void FixedUpdate()
+        protected virtual void FixedUpdate()
         {
             if (_target == null)
                 return;

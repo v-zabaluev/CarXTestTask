@@ -1,5 +1,6 @@
-﻿using Gameplay.Monsters.Movement.MovementVariants;
+﻿using System.Collections;
 using UnityEngine;
+using Gameplay.Monsters.Movement.MovementVariants;
 
 namespace Gameplay.Monsters.Movement
 {
@@ -14,6 +15,7 @@ namespace Gameplay.Monsters.Movement
 
         private Transform _moveTarget;
         private Transform _orbitTarget;
+        private Coroutine _circularRoutine;
 
         public void SetTargetPoints(Transform moveTarget, Transform orbitTarget)
         {
@@ -21,47 +23,91 @@ namespace Gameplay.Monsters.Movement
             _orbitTarget = orbitTarget;
         }
 
+        public MonsterMovementType GetCurrentMovementType() => _currentType;
+
         public void SwitchMovementType(MonsterMovementType newType)
         {
-            ApplyMovementType(newType);
+            if (_circularRoutine != null)
+            {
+                StopCoroutine(_circularRoutine);
+            }
+
+            if (newType == MonsterMovementType.Circular && _circular != null)
+            {
+                _circularRoutine = StartCoroutine(SwitchToCircularRoutine());
+            }
+            else
+            {
+                ApplyMovementType(newType);
+            }
         }
 
-        public MonsterMovementType GetCurrentMovementType()
+        private IEnumerator SwitchToCircularRoutine()
         {
-            return _currentType;
+            _circular.Construct(_orbitTarget);
+            ApplyMovementType(MonsterMovementType.Linear);
+
+            Vector3 orbitPoint = _circular.GetClosestOrbitPoint(transform.position);
+            _linear.StartMoveToPoint(orbitPoint);
+
+            while (!_circular.IsOnOrbit(transform.position))
+            {
+                yield return new WaitForFixedUpdate();
+            }
+
+            _linear.StopMoveToPoint();
+            ApplyMovementType(MonsterMovementType.Circular);
         }
 
         private void ApplyMovementType(MonsterMovementType type)
         {
             _currentType = type;
 
-            if (_linear != null)
-            {
-                _linear.enabled = type == MonsterMovementType.Linear;
-                if (_linear.enabled) _linear.SetTarget(_moveTarget);
-            }
+            DeactivateMoveMode();
 
-            if (_accelerated != null)
+            switch (type)
             {
-                _accelerated.enabled = type == MonsterMovementType.Accelerated;
-                if (_accelerated.enabled) _accelerated.SetTarget(_moveTarget);
-            }
+                case MonsterMovementType.Linear:
+                    if (_linear != null)
+                    {
+                        _linear.enabled = true;
+                        _linear.SetTarget(_moveTarget);
+                    }
 
-            if (_circular != null)
-            {
-                _circular.enabled = type == MonsterMovementType.Circular;
+                    break;
 
-                if (_circular.enabled)
-                {
-                    _circular.Construct(_orbitTarget);
-                }
-            }
-            
-            if (_pathFollow != null)
-            {
-                _pathFollow.enabled = type == MonsterMovementType.PathFollow;
-            }
+                case MonsterMovementType.Accelerated:
+                    if (_accelerated != null)
+                    {
+                        _accelerated.enabled = true;
+                        _accelerated.SetTarget(_moveTarget);
+                    }
 
+                    break;
+
+                case MonsterMovementType.Circular:
+                    if (_circular != null)
+                    {
+                        _circular.Construct(_orbitTarget);
+                        _circular.enabled = true;
+                    }
+
+                    break;
+
+                case MonsterMovementType.PathFollow:
+                    if (_pathFollow != null)
+                        _pathFollow.enabled = true;
+
+                    break;
+            }
+        }
+
+        private void DeactivateMoveMode()
+        {
+            if (_linear != null) _linear.enabled = false;
+            if (_accelerated != null) _accelerated.enabled = false;
+            if (_circular != null) _circular.enabled = false;
+            if (_pathFollow != null) _pathFollow.enabled = false;
         }
 
         public bool GetInterceptInfo(Vector3 shootPointPosition, float projectileSpeed,
@@ -70,28 +116,17 @@ namespace Gameplay.Monsters.Movement
             switch (_currentType)
             {
                 case MonsterMovementType.Linear:
-                    _linear.CalculateIntercept(shootPointPosition, projectileSpeed, out projectileDirection,
-                        out interceptPoint);
-
-                    return true;
-
+                    return _linear.CalculateIntercept(shootPointPosition, projectileSpeed,
+                        out projectileDirection, out interceptPoint);
                 case MonsterMovementType.Accelerated:
-                    _accelerated.CalculateIntercept(shootPointPosition, projectileSpeed, out projectileDirection,
-                        out interceptPoint);
-
-                    return true;
-
+                    return _accelerated.CalculateIntercept(shootPointPosition, projectileSpeed,
+                        out projectileDirection, out interceptPoint);
                 case MonsterMovementType.Circular:
-                    _circular.CalculateIntercept(shootPointPosition, projectileSpeed, out projectileDirection,
-                        out interceptPoint);
-
-                    return true;
-                
+                    return _circular.CalculateIntercept(shootPointPosition, projectileSpeed,
+                        out projectileDirection, out interceptPoint);
                 case MonsterMovementType.PathFollow:
-                    _pathFollow.CalculateIntercept(shootPointPosition, projectileSpeed, out projectileDirection,
-                        out interceptPoint);
-                    return true;
-
+                    return _pathFollow.CalculateIntercept(shootPointPosition, projectileSpeed,
+                        out projectileDirection, out interceptPoint);
                 default:
                     projectileDirection = Vector3.zero;
                     interceptPoint = Vector3.zero;
